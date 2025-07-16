@@ -1,6 +1,6 @@
 import NextAuth, { JWT } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import jwt from "jsonwebtoken";
+import { jwtDecode } from "jwt-decode";
 import { LoginResponse, DecodedToken } from "@/types";
 import { setAuthState } from "@/features/auth/authSlice";
 import { store } from "@/store/store";
@@ -34,9 +34,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const data: LoginResponse = await response.json();
 
           if (response.ok && data.status === "Success") {
-            const decodedToken = jwt.decode(data.data.token);
-            if (decodedToken && typeof decodedToken !== "string") {
-              const token = decodedToken as DecodedToken;
+            const decodedToken = jwtDecode<DecodedToken>(data.data.token);
+            if (decodedToken) {
               return {
                 employee_id: decodedToken.employee_id,
                 employee_email: decodedToken.employee_email,

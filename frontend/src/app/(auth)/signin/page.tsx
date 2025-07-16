@@ -1,72 +1,147 @@
 "use client";
-import  { useState } from 'react'
-import {signIn} from 'next-auth/react'
-import { useForm,SubmitHandler } from 'react-hook-form';
-import { PulseLoader } from 'react-spinners';
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { PulseLoader } from "react-spinners";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
-type FormFields= {
-  email:string,
-  password:string 
-}
+type FormFields = {
+  email: string;
+  password: string;
+};
 
-
-  function  SignInPage() {
-
-
-const [error,setError]=useState(false)
+function SignInPage() {
+  const [error, setError] = useState(false);
   const router = useRouter();
-const searchParams = useSearchParams();
- 
-    const {register,handleSubmit,formState:{errors,isSubmitting}}=useForm<FormFields>()
+  const searchParams = useSearchParams();
 
-    const onSubmit:SubmitHandler<FormFields>=async(data)=>{
-      const {email,password}=data 
-      try {
-       const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormFields>();
 
-        const response = await signIn("credentials", {
-          redirect: false,
-          email,
-          password,
-          callbackUrl,
-        });
-  
-        if (response?.error) {
-          // Handle sign-in errors
-          setError(true)
-          console.error("Error during sign-in:", response.error);
-          
-         
-        } else {
-          // Redirect or handle successful login
-          console.log("Success:", response);
-          router.push(response?.url || "/");
-        }
-      } catch (error) {
-        console.error("Error during sign-in:", error);
+  const onSubmit: SubmitHandler<FormFields> = async (data) => {
+    const { email, password } = data;
+
+    try {
+      const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+
+      const response = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+        callbackUrl,
+      });
+
+      if (response?.error) {
+        setError(true);
+        console.error("Error during sign-in:", response.error);
+      } else {
+        router.push(response?.url || "/dashboard");
       }
+    } catch (error) {
+      console.error("Error during sign-in:", error);
     }
- 
-  return (
-    <div className='max-w-[1200px] mx-auto px-10'>
-      <p className="text-4xl font-bold text-customBlue ">
-        Login to your account{" "}
-        <span className=" inline-block ml-3 w-12 h-[2px] bg-customeRed"></span>
-      </p>
-      <form className='mt-10' onSubmit={handleSubmit(onSubmit)}>
-        <input {...register("email",{required:"Email is required",pattern:{value:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, message: "Invalid email address"}})} className='block w-full sm:w-[50%] p-2 mb-4 border border-gray-300  rounded' placeholder='Email' />
-        {errors.email && <p className='text-red-500'>{errors.email.message}</p>}
-        <input {...register("password",{required:"Password is required",minLength:{value:8,message:"Password must be at least 8 character"}})} className='block w-full sm:w-[50%] p-2 mb-4 border border-gray-300  rounded ' placeholder='Password'  type='password'/>
-        {errors.password && <p className='text-red-500'>{errors.password.message}</p>}
-        <button disabled={isSubmitting} className='bg-customeRed px-5 py-3 text-white ' type='submit'>{isSubmitting?<PulseLoader size={8} color="#fff"  />:"Sign In"}</button>
-        {error && <p className='text-red-500'>Invalid Credential</p>}
+  };
 
-      </form>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="flex w-full max-w-4xl shadow-2xl">
+        {/* Left Panel: Form */}
+        <div className="w-full lg:w-1/2 bg-white p-8 sm:p-12">
+          <div className="mb-8 text-center">
+            <h1 className="text-4xl font-extrabold text-gray-800 font-jost">
+              Sign In
+            </h1>
+            <p className="text-gray-500 mt-2">
+              Welcome back! Please sign in to your account.
+            </p>
+          </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div>
+              <input
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                    message: "Invalid email address",
+                  },
+                })}
+                className="w-full p-4 bg-gray-50 border-2 border-gray-200 focus:outline-none focus:border-customeRed focus:ring-0"
+                placeholder="Email Address"
+              />
+              {errors.email && (
+                <p className="text-red-500 mt-1">{errors.email.message}</p>
+              )}
+            </div>
+            <div>
+              <input
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: {
+                    value: 8,
+                    message: "Password must be at least 8 characters",
+                  },
+                })}
+                className="w-full p-4 bg-gray-50 border-2 border-gray-200 focus:outline-none focus:border-customeRed focus:ring-0"
+                placeholder="Password"
+                type="password"
+              />
+              {errors.password && (
+                <p className="text-red-500 mt-1">{errors.password.message}</p>
+              )}
+            </div>
+            {error && (
+              <p className="text-red-500 text-center">
+                Invalid credentials. Please try again.
+              </p>
+            )}
+            <div>
+              <button
+                disabled={isSubmitting}
+                className="w-full bg-customeRed text-white font-bold py-4 px-6 hover:bg-red-700 transition-all duration-300"
+                type="submit"
+              >
+                {isSubmitting ? (
+                  <PulseLoader size={10} color="#fff" />
+                ) : (
+                  "SIGN IN"
+                )}
+              </button>
+            </div>
+            <div className="text-center text-sm text-gray-500">
+              <p>
+                For demo purposes, use{" "}
+                <span className="font-semibold text-gray-600">
+                  admin@gmail.com
+                </span>{" "}
+                and password{" "}
+                <span className="font-semibold text-gray-600">password123</span>
+                {" "} to view the admin pages
+                .
+              </p>
+            </div>
+            <div className="text-center">
+              <Link
+                href="/contact"
+                className="text-sm text-gray-500 hover:text-customeRed hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
+          </form>
+        </div>
+
+        {/* Right Panel: Image */}
+        <div
+          className="hidden lg:block lg:w-1/2 bg-cover bg-center"
+          style={{ backgroundImage: "url('/images/vban1.jpg')" }}
+        ></div>
+      </div>
     </div>
-  )
+  );
 }
 
-export default SignInPage
-
-
+export default SignInPage;

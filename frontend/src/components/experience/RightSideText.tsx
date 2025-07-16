@@ -1,24 +1,24 @@
+import Button from "../ui/Button";
+
 function RightSide() {
   return (
-    <div className="max-w-[640px]">
-      <p className="text-customBlue">Welcome to Our Workshop</p>
-      <p className="text-customBlue text-2xl font-bold">We have 24 years experience</p>
-      <p className="bg-customeRed w-16 h-[2px] my-3"></p>
-      <p className="font-light text-base mt-5">
-        Bring to the table win-win survival strategies to ensure proactive
-        domination. At the end of the day, going forward, a new normal that has
-        evolved from generation X is on the runway heading towards a streamlined
-        cloud solution. User generated content in real-time will have multiple
-        touchpoints for offshoring. 
+    <div className="max-w-xl">
+      <p className="text-lg text-customeRed font-semibold">ABOUT OUR COMPANY</p>
+      <h2 className="text-4xl font-bold text-customBlue mt-2 font-jost">
+        We Are The Best Choice For Your Car
+      </h2>
+      <div className="w-16 h-1 bg-customeRed my-5"></div>
+      <p className="text-gray-500 leading-relaxed">
+        We provide top-notch services to ensure your vehicle is in the best
+        condition. Our team of experienced mechanics is dedicated to offering
+        reliable and efficient solutions for all your car needs.
       </p>
-      <p  className="font-light text-base mt-5">
-      Capitalize on low hanging fruit to identify
-        a ballpark value added activity to beta test. Override the digital
-        divide with additional clickthroughs from DevOps. Nanotechnology
-        immersion along the information highway will close the loop on focusing
-        solely on the bottom line.
+      <p className="text-gray-500 leading-relaxed mt-4">
+        From routine maintenance to complex repairs, we use the latest tools and
+        technology to deliver high-quality workmanship. Your satisfaction is our
+        priority, and we strive to exceed your expectations with every visit.
       </p>
-      <button className="mt-11 bg-customeRed py-5 px-8 text-white">About Us -{'>'}</button>
+      <Button className="mt-8 rounded-none">ABOUT US →</Button>
     </div>
   );
 }

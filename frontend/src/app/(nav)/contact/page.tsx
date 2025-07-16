@@ -1,72 +1,108 @@
-import Link from "next/link";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 import Map from "@/components/map/Map";
-import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
-import MarkEmailReadOutlinedIcon from "@mui/icons-material/MarkEmailReadOutlined";
-import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
-function page() {
+
+const ContactPage = () => {
   return (
-    <div className=" ">
-      <div className=" relative bg-banner2 w-full h-[200px] sm:h-[300px] md:h-[400px] lg:[600px] bg-cover bg-no-repeat text-white transition-all duration-500 ease-in-out ">
-        <div className="absolute bottom-10 left-10">
-          <p className="  text-2xl font-bold  ">Contact Us</p>
-          <div className="flex gap-2 text-base">
-            <Link href="/" className="text-customeRed">
-              {" "}
-              Home
-            </Link>{" "}
-            <span>{">"}</span>
-            <Link href="/contact" className="text-white">
-              {" "}
-              Contact Us
-            </Link>
-          </div>
-        </div>
-      </div>
-      <div className="max-w-[1200px] mt-10 lg:mt-20 px-10 mx-auto lg:flex gap-10 justify-center">
-        <div className="lg:w-[50%]">
-          <Map />
-        </div>
-        <div className="lg:w-[50%] mt-10  lg:mt-0">
-          <p className="text-4xl font-bold text-customBlue mb-5">Our Address</p>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nobis,
-            modi quo qui quas, quos odio maxime voluptas aliquid minima saepe
-            magni ipsa praesentium recusandae facilis aliquam aut, eaque sunt
-            eos.
-          </p>
+    <>
+      <Breadcrumb title="Contact Us" backgroundImageUrl="/images/banner1.jpg" />
 
-          <div className="  ">
-            <div className="  flex gap-5 pt-7  ">
-              <LocationOnOutlinedIcon
-                className="text-customeRed"
-                fontSize="large"
-              />
-              <p>Addis Ababa, Ethiopia.</p>
+      <div className="py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+            {/* Left Column: Contact Form */}
+            <div>
+              <h2 className="text-4xl font-bold text-gray-800 font-jost mb-4">
+                Send Us a Message
+              </h2>
+              <p className="text-gray-500 mb-8">
+                Have a question or need to schedule a service? Fill out the form
+                below and we&apos;ll get back to you as soon as possible.
+              </p>
+              <form className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <input
+                    type="text"
+                    placeholder="Your Name"
+                    className="w-full p-4 border border-gray-300 rounded-md focus:ring-customeRed focus:border-customeRed"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Your Email"
+                    className="w-full p-4 border border-gray-300 rounded-md focus:ring-customeRed focus:border-customeRed"
+                  />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Subject"
+                  className="w-full p-4 border border-gray-300 rounded-md focus:ring-customeRed focus:border-customeRed"
+                />
+                <textarea
+                  placeholder="Your Message"
+                  rows={5}
+                  className="w-full p-4 border border-gray-300 rounded-md focus:ring-customeRed focus:border-customeRed"
+                ></textarea>
+                <button
+                  type="submit"
+                  className="w-full bg-customeRed text-white font-bold py-4 px-6 rounded-md hover:bg-red-700 transition-colors duration-300"
+                >
+                  Send Message
+                </button>
+              </form>
             </div>
-            <div className=" pt-7  flex gap-5">
-              <MarkEmailReadOutlinedIcon
-                className="text-customeRed"
-                fontSize="large"
-              />
-              <p>
-                Email us:{" "}
-                <a href="mailto:gadisadiriba25@gmail.com" className=" ">
-                  gadisadiriba25@gmail.com
-                </a>
-              </p>{" "}
-            </div>
-            <div className=" pt-7  flex gap-5">
-              <LocalPhoneOutlinedIcon
-                className="text-customeRed"
-                fontSize="large"
-              />
-              <p>Call us on +2529044710</p>
+
+            {/* Right Column: Contact Details & Map */}
+            <div className="space-y-12">
+              <div>
+                <h2 className="text-4xl font-bold text-gray-800 font-jost mb-6">
+                  Contact Information
+                </h2>
+                <div className="space-y-6">
+                  <div className="flex items-start gap-5">
+                    <i className="flaticon-pin text-customeRed text-4xl mt-1"></i>
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-800">
+                        Our Address
+                      </h3>
+                      <p className="text-gray-500">
+                        Lot 4127, Jalan Rizab Yaakob, Kampung Bukit Hijau, 45800
+                        Kuala Selangor, Selangor, Malaysia
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-5">
+                    <i className="flaticon-email text-customeRed text-4xl mt-1"></i>
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-800">
+                        Email Us
+                      </h3>
+                      <a
+                        href="mailto:abegarage@gmail.com"
+                        className="text-gray-500 hover:text-customeRed"
+                      >
+                        abegarage@gmail.com
+                      </a>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-5">
+                    <i className="flaticon-call text-customeRed text-4xl mt-1"></i>
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-800">
+                        Call Us
+                      </h3>
+                      <p className="text-gray-500">(319) 555-0123</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="h-80 rounded-md overflow-hidden shadow-lg">
+                <Map />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
-}
+};
 
-export default page;
+export default ContactPage;
