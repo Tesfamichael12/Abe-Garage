@@ -1,83 +1,100 @@
-const { create } = require('domain');
-const {query,getConnection} = require('../config/db.config');
+const { query, getConnection } = require("../config/db.config");
 
-const crypto = require('crypto');
-const Jwt_secret=process.env.JWT_SECRET
-
+const crypto = require("crypto");
+const Jwt_secret = process.env.JWT_SECRET;
 
 async function createOrder(order) {
-    const connection=await getConnection()
+  const connection = await getConnection();
 
- // Generate a unique hash using employee_id, customer_id, vehicle_id, and current timestamp
- const uniqueString = `${order.employee_id}-${order.customer_id}-${order.vehicle_id}-${Date.now()}`;
- const order_hash = crypto.createHash('sha256').update(uniqueString + Jwt_secret).digest('hex');
+  // Generate a unique hash using employee_id, customer_id, vehicle_id, and current timestamp
+  const uniqueString = `${order.employee_id}-${order.customer_id}-${
+    order.vehicle_id
+  }-${Date.now()}`;
+  const order_hash = crypto
+    .createHash("sha256")
+    .update(uniqueString + Jwt_secret)
+    .digest("hex");
 
-    try {
-        await connection.beginTransaction();
+  try {
+    await connection.beginTransaction();
 
-        const sql1='INSERT INTO orders (employee_id, customer_id,vehicle_id, active_order,order_hash) VALUES (?,?,?,?,?)';
-        const [result1]=await connection.query(sql1,[order.employee_id,order.customer_id,order.vehicle_id,1,order_hash]);
-        if(result1.affectedRows!==1){
-            throw new Error('Failed to insert into orders');
-
-        }
-        const order_id=result1.insertId;
-        const sql2='INSERT INTO order_info (order_id,order_total_price,additional_request,additional_requests_completed) VALUES (?,?,?,?)';
-        
-        
-
-        if(order?.additional_request)
-            {
-        const [result2]=await connection.query(sql2,[order_id,order.order_total_price,order.additional_request,0]);
-        if(result2.affectedRows!==1){
-            throw new Error('Failed to insert into order_info');
-        }}
-        
-        else{
-            const [result2]=await connection.query(sql2,[order_id,order.order_total_price,null,null]);
-            if(result2.affectedRows!==1){
-                throw new Error('Failed to insert into order_info');
-            }
-        }
-        
-        
-
-        const sql3="INSERT INTO order_services (order_id,service_id,service_completed) VALUES (?,?,?)";
-
-if(order?.order_services){
-        for(let i=0;i<order.order_services.length;i++){
-            const [result3]=await connection.query(sql3,[order_id,order.order_services[i].service_id,0]);
-            if(result3.affectedRows!==1){
-                throw new Error('Failed to insert into order_services');
-            }
-        }
+    const sql1 =
+      "INSERT INTO orders (employee_id, customer_id,vehicle_id, active_order,order_hash) VALUES (?,?,?,?,?)";
+    const [result1] = await connection.query(sql1, [
+      order.employee_id,
+      order.customer_id,
+      order.vehicle_id,
+      1,
+      order_hash,
+    ]);
+    if (result1.affectedRows !== 1) {
+      throw new Error("Failed to insert into orders");
     }
-        const sql4="INSERT INTO order_status (order_id,order_status) VALUES (?,?)";
-        const [result4]=await connection.query(sql4,[order_id,0]);
-        if(result4.affectedRows!==1){
-            throw new Error('Failed to insert into order_status');
-        }
+    const order_id = result1.insertId;
+    const sql2 =
+      "INSERT INTO order_info (order_id,order_total_price,additional_request,additional_requests_completed) VALUES (?,?,?,?)";
 
-        await connection.commit();
-
-        return true;
-        
-    } catch (error) {
-        connection.rollback();
-        console.log('Error creating order',error.message);
-        return false;
-        
-    }finally{
-        connection.release();
+    if (order?.additional_request) {
+      const [result2] = await connection.query(sql2, [
+        order_id,
+        order.order_total_price,
+        order.additional_request,
+        0,
+      ]);
+      if (result2.affectedRows !== 1) {
+        throw new Error("Failed to insert into order_info");
+      }
+    } else {
+      const [result2] = await connection.query(sql2, [
+        order_id,
+        order.order_total_price,
+        null,
+        null,
+      ]);
+      if (result2.affectedRows !== 1) {
+        throw new Error("Failed to insert into order_info");
+      }
     }
+
+    const sql3 =
+      "INSERT INTO order_services (order_id,service_id,service_completed) VALUES (?,?,?)";
+
+    if (order?.order_services) {
+      for (let i = 0; i < order.order_services.length; i++) {
+        const [result3] = await connection.query(sql3, [
+          order_id,
+          order.order_services[i].service_id,
+          0,
+        ]);
+        if (result3.affectedRows !== 1) {
+          throw new Error("Failed to insert into order_services");
+        }
+      }
+    }
+    const sql4 =
+      "INSERT INTO order_status (order_id,order_status) VALUES (?,?)";
+    const [result4] = await connection.query(sql4, [order_id, 0]);
+    if (result4.affectedRows !== 1) {
+      throw new Error("Failed to insert into order_status");
+    }
+
+    await connection.commit();
+
+    return true;
+  } catch (error) {
+    connection.rollback();
+    console.log("Error creating order", error.message);
+    return false;
+  } finally {
+    connection.release();
+  }
 }
 
-async function getOrders(page,limit) {
+async function getOrders(page, limit) {
+  const offset = (page - 1) * limit;
 
-    const offset=(page-1)*limit;
-
-    try {
-        const sql=`
+  try {
+    const sql = `
       SELECT 
         o.order_id,
         o.employee_id,
@@ -112,26 +129,20 @@ FROM
       LIMIT ? OFFSET ?;
     `;
 
-    const orders=await query(sql,[limit,offset]);
+    const orders = await query(sql, [limit, offset]);
 
-    if(orders.length>0){
-        return orders;
-        }
-        
-    } catch (error) {
-        console.log('Error getting orders',error.message);
-        throw new Error('Error getting orders');
-
-        
+    if (orders.length > 0) {
+      return orders;
     }
-
-
-
+  } catch (error) {
+    console.log("Error getting orders", error.message);
+    throw new Error("Error getting orders");
+  }
 }
 
-async function getOrderByHash(hash){
-    try {
-        const sql=`
+async function getOrderByHash(hash) {
+  try {
+    const sql = `
         SELECT 
             o.order_id,
             o.employee_id,
@@ -154,17 +165,14 @@ async function getOrderByHash(hash){
             o.order_hash = ?;
     `;
 
-    
-
-    const [order]=await query(sql,[hash]);
+    const [order] = await query(sql, [hash]);
     //check if order performed is not successful
 
-        if(order && order.length<1){
-            return false;
+    if (order && order.length < 1) {
+      return false;
+    }
 
-        }
-
-        const sql2= `SELECT 
+    const sql2 = `SELECT 
         os.order_service_id,
         os.service_id,
         os.service_completed,
@@ -178,79 +186,87 @@ async function getOrderByHash(hash){
         os.order_id = ?;
 `;
 
-const services=await query(sql2,[order.order_id]);
+    const services = await query(sql2, [order.order_id]);
 
-order.order_services=services;
+    order.order_services = services;
 
-return order;
-
-
-    
-        
-    } catch (error) {
-        console.log('Error getting order by hash',error.message);
-        throw new Error('Error getting order by hash');
-
-        
-    }
+    return order;
+  } catch (error) {
+    console.log("Error getting order by hash", error.message);
+    throw new Error("Error getting order by hash");
+  }
 }
 
-async function updateOrder(order){
-    const connection=await getConnection();
-    try {
-        await connection.beginTransaction();
+async function updateOrder(order) {
+  const connection = await getConnection();
+  try {
+    await connection.beginTransaction();
 
-        const sql1='UPDATE orders SET active_order = ? WHERE order_id = ?';
-        const [result1]=await connection.query(sql1,[order.active_order,order.order_id]);
-        if(result1.affectedRows!==1){
-            throw new Error('Failed to update orders');
-
-        }
-
-        const sql2='UPDATE order_info SET order_total_price = ?, additional_request = ?, additional_requests_completed = ? WHERE order_id = ?';
-        const [result2]=await connection.query(sql2,[order.order_total_price,order.additional_request,order.additional_requests_completed,order.order_id]);
-        if(result2.affectedRows!==1){
-            throw new Error('Failed to update order_info');
-        }
-
-        const sql3='UPDATE order_status SET order_status = ? WHERE order_id = ?';
-        const [result3]=await connection.query(sql3,[order.order_status,order.order_id]);
-        if(result3.affectedRows!==1){
-            throw new Error('Failed to update order_status');
-        }
-
-        const sql4='DELETE FROM order_services WHERE order_id = ?';
-        const [result4]=await connection.query(sql4,[order.order_id]);
-        if(result4.affectedRows<1){
-            throw new Error('Failed to delete from order_services');
-        }
-
-        const sql5="INSERT INTO order_services (order_id,service_id,service_completed) VALUES (?,?,?)";
-
-        for(let i=0;i<order.order_services.length;i++){
-            const [result5]=await connection.query(sql5,[order.order_id,order.order_services[i].service_id,order.order_services[i].service_completed]);
-            if(result5.affectedRows!==1){
-                throw new Error('Failed to insert into order_services');
-            }
-        }
-
-        await connection.commit();
-
-        return true;
-        
-    } catch (error) {
-        connection.rollback();
-        console.log('Error updating order',error.message);
-        return false;
-        
-    }finally{
-        connection.release();
+    const sql1 = "UPDATE orders SET active_order = ? WHERE order_id = ?";
+    const [result1] = await connection.query(sql1, [
+      order.active_order,
+      order.order_id,
+    ]);
+    if (result1.affectedRows !== 1) {
+      throw new Error("Failed to update orders");
     }
+
+    const sql2 =
+      "UPDATE order_info SET order_total_price = ?, additional_request = ?, additional_requests_completed = ? WHERE order_id = ?";
+    const [result2] = await connection.query(sql2, [
+      order.order_total_price,
+      order.additional_request,
+      order.additional_requests_completed,
+      order.order_id,
+    ]);
+    if (result2.affectedRows !== 1) {
+      throw new Error("Failed to update order_info");
+    }
+
+    const sql3 = "UPDATE order_status SET order_status = ? WHERE order_id = ?";
+    const [result3] = await connection.query(sql3, [
+      order.order_status,
+      order.order_id,
+    ]);
+    if (result3.affectedRows !== 1) {
+      throw new Error("Failed to update order_status");
+    }
+
+    const sql4 = "DELETE FROM order_services WHERE order_id = ?";
+    const [result4] = await connection.query(sql4, [order.order_id]);
+    if (result4.affectedRows < 1) {
+      throw new Error("Failed to delete from order_services");
+    }
+
+    const sql5 =
+      "INSERT INTO order_services (order_id,service_id,service_completed) VALUES (?,?,?)";
+
+    for (let i = 0; i < order.order_services.length; i++) {
+      const [result5] = await connection.query(sql5, [
+        order.order_id,
+        order.order_services[i].service_id,
+        order.order_services[i].service_completed,
+      ]);
+      if (result5.affectedRows !== 1) {
+        throw new Error("Failed to insert into order_services");
+      }
+    }
+
+    await connection.commit();
+
+    return true;
+  } catch (error) {
+    connection.rollback();
+    console.log("Error updating order", error.message);
+    return false;
+  } finally {
+    connection.release();
+  }
 }
 
-async function getCustomerOrders(id){
-    try {
-        const sql=`
+async function getCustomerOrders(id) {
+  try {
+    const sql = `
        SELECT 
             o.order_id,
             o.employee_id,
@@ -286,19 +302,22 @@ async function getCustomerOrders(id){
             o.customer_id = ?;
     `;
 
-    const orders=await query(sql,[id]);
+    const orders = await query(sql, [id]);
 
-    if(orders.length>0){
-        return orders;
-        }else{
-            return []
-        }
-        
-    } catch (error) {
-        console.log('Error getting customer orders',error.message);
-        throw new Error('Error getting customer orders');
-
-        
+    if (orders.length > 0) {
+      return orders;
+    } else {
+      return [];
     }
+  } catch (error) {
+    console.log("Error getting customer orders", error.message);
+    throw new Error("Error getting customer orders");
+  }
 }
-module.exports = {createOrder,getOrders,getOrderByHash,updateOrder,getCustomerOrders};
+module.exports = {
+  createOrder,
+  getOrders,
+  getOrderByHash,
+  updateOrder,
+  getCustomerOrders,
+};

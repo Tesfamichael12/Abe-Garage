@@ -1,54 +1,50 @@
+const employeeService = require("../services/employee.service");
+const jwt = require("jsonwebtoken");
 
-const employeeService = require('../services/employee.service');
-const jwt=require('jsonwebtoken')
+const verifToken = (req, res, next) => {
+  const authHeader = req.header("Authorization");
+  if (!authHeader) {
+    return res.status(401).send({
+      status: "Fail",
+      message: "Access Denied",
+    });
+  }
 
+  const token = authHeader.split(" ")[1];
+  // console.log("token",token)
+  // console.log("secret",process.env.JWT_SECRET)
+  if (!token) {
+    return res.status(401).send({
+      status: "Fail",
+      message: "Access Denied",
+    });
+  }
 
-const verifToken=  (req,res,next)=>{
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.employee_email = decoded.employee_email;
+    next();
+  } catch (err) {
+    res.status(400).send({
+      status: "Fail",
+      message: "Invalid Token",
+    });
+  }
+};
 
-    const authHeader = req.header('Authorization');
-    if(!authHeader){
-      
-        return res.status(401).send({
-            status:"Fail",
-            message:"Access Denied"})
-    }
+const isAdmin = async (req, res, next) => {
+  const email = req.employee_email;
 
-    const token=authHeader.split(' ')[1]
-    // console.log("token",token)
-    // console.log("secret",process.env.JWT_SECRET)
-    if(!token){
-        return res.status(401).send({
-            status:"Fail",
-            message:"Access Denied"})
-    }
+  const employee = await employeeService.getEmployeeByEmail(email);
 
-    try{
-        const decoded=  jwt.verify(token,process.env.JWT_SECRET)
-        req.employee_email=decoded.employee_email
-        next()
-    }catch(err){
-        res.status(400).send({
-            status:"Fail",
-            message:"Invalid Token"})
-    }
+  if (employee && employee[0]?.company_role_id === 1) {
+    next();
+  } else {
+    res.status(403).send({
+      status: "Fail",
+      message: "Access Denied",
+    });
+  }
+};
 
-}
-
-const isAdmin=async (req,res,next)=>{
-
-
-    const email=req.employee_email
-
-    const employee=await employeeService.getEmployeeByEmail(email)
-
-    if(employee[0]?.company_role_id===2){
-        next()
-    }else{
-        res.status(403).send({
-            status:"Fail",
-            message:"Access Denied"})
-    }
-
-}
-
-module.exports={verifToken,isAdmin}
+module.exports = { verifToken, isAdmin };
