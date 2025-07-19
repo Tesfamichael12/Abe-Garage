@@ -1,4 +1,4 @@
-import NextAuth, { JWT } from "next-auth";
+import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { jwtDecode } from "jwt-decode";
 import { LoginResponse, DecodedToken } from "@/types";
@@ -40,7 +40,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 employee_id: decodedToken.employee_id,
                 employee_email: decodedToken.employee_email,
                 employee_first_name: decodedToken.employee_first_name,
-                employee_role: decodedToken.employee_role,
+                employee_role:
+                  decodedToken.employee_role === 1 ? "admin" : "employee",
                 token: data.data.token,
               };
             } else {
@@ -74,13 +75,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token;
     },
     async session({ session, token }) {
-      const customToken = token as unknown as JWT;
-      session.user.employee_id = customToken.employee_id;
-      session.user.employee_email = customToken.employee_email;
-      session.user.employee_first_name = customToken.employee_first_name;
-      session.user.employee_role = customToken.employee_role;
-      session.user.token = customToken.token;
-
+      if (session.user) {
+        session.user.employee_id = token.employee_id as number;
+        session.user.employee_email = token.employee_email as string;
+        session.user.employee_first_name = token.employee_first_name as string;
+        session.user.employee_role = token.employee_role as string;
+        session.user.token = token.token as string;
+      }
       return session;
     },
   },

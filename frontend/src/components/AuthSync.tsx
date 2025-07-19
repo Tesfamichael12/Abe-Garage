@@ -1,41 +1,34 @@
 "use client";
-import { useSession } from "next-auth/react";  // To track the session state
+import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setAuthState,removeAuthState  } from "@/features/auth/authSlice"; 
+import { setAuthState, removeAuthState } from "@/features/auth/authSlice";
 import { persistor } from "@/store/store";
 
 const AuthSync = () => {
-  const { data: session,status } = useSession();  // Get the current session
-  const dispatch = useDispatch();  // Get the Redux dispatch function
+  const { data: session, status } = useSession();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-   
-     
-    if (status=="loading") return
-    // If session data exists (meaning the user is logged in)
+    if (status === "loading") return;
+
     if (session?.user?.token) {
-     
       dispatch(
         setAuthState({
           employee_id: session.user.employee_id,
           employee_email: session.user.employee_email,
           employee_first_name: session.user.employee_first_name,
-          employee_role: "admin",
+          employee_role: session.user.employee_role,
           token: session.user.token,
         })
       );
     } else {
-
-      // If no session, clear the auth state in Redux
-      dispatch(removeAuthState()); // Dispatch removeAuthState action
-    persistor.purge();
- 
-      
+      dispatch(removeAuthState());
+      persistor.purge();
     }
-  }, [session, status, dispatch]);  // This effect runs every time the session changes
+  }, [session, status, dispatch]);
 
-  return null;  // This doesn't render any UI; it only syncs state
+  return null;
 };
 
 export default AuthSync;

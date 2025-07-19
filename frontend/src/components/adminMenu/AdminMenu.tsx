@@ -2,9 +2,14 @@
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { 
-  FaTachometerAlt, FaUsers, FaBoxOpen, FaUserPlus, 
-  FaUserTie, FaWrench, FaBars 
+import {
+  FaTachometerAlt,
+  FaUsers,
+  FaBoxOpen,
+  FaUserPlus,
+  FaUserTie,
+  FaWrench,
+  FaBars,
 } from "react-icons/fa"; // Icons
 
 const menuItems = [
@@ -27,23 +32,31 @@ const AdminMenu = () => {
   }
 
   return (
-    <div className={`bg-blue-950 text-white h-screen flex flex-col transition-all duration-300 ${isMenuOpen ? "w-64" : "w-20"}`}>
-      
+    <div
+      className={`bg-blue-950 text-white h-screen flex flex-col transition-all duration-300 ${
+        isMenuOpen ? "w-64" : "w-20"
+      }`}
+    >
       {/* Header + Toggle Button */}
       <div className="flex items-center justify-between p-4">
         {isMenuOpen && <h1 className="text-2xl font-bold">Admin</h1>}
-        <FaBars 
+        <FaBars
           className="text-white text-2xl cursor-pointer hover:scale-110 transition"
-          onClick={() => setIsMenuOpen(!isMenuOpen)} 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
         />
       </div>
 
       {/* Menu Items */}
       <ul className="flex-1 mt-5 space-y-2">
         {menuItems.map(({ name, href, icon: Icon }) => (
-          <li key={name} className="flex items-center space-x-3 p-3 hover:bg-blue-800 rounded-md">
-            <Icon className="text-xl" />
-            {isMenuOpen && <Link href={href} className="text-sm">{name}</Link>}
+          <li key={name}>
+            <Link
+              href={href}
+              className="flex items-center space-x-3 p-3 hover:bg-blue-800 rounded-md"
+            >
+              <Icon className="text-xl" />
+              {isMenuOpen && <span className="text-sm">{name}</span>}
+            </Link>
           </li>
         ))}
       </ul>

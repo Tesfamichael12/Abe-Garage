@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   useGetcustomerByIdQuery,
   useUpdateCutomerInfoMutation,
@@ -9,9 +9,9 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { customerUpdateForm } from "@/types";
 import { PulseLoader } from "react-spinners";
 
-
 function page() {
   const { id } = useParams();
+  const router = useRouter();
   const customer_id = parseInt(id as string);
 
   const {
@@ -20,7 +20,8 @@ function page() {
     isLoading,
   } = useGetcustomerByIdQuery({ customer_id });
 
-  const [updateCustomerInfo,{isLoading:isUpdating}] = useUpdateCutomerInfoMutation()
+  const [updateCustomerInfo, { isLoading: isUpdating }] =
+    useUpdateCutomerInfoMutation();
   const {
     register,
     handleSubmit,
@@ -35,8 +36,6 @@ function page() {
       active_customer_status: false,
     },
   });
-
-  
 
   useEffect(() => {
     console.log(customer?.data?.customer);
@@ -53,19 +52,22 @@ function page() {
       );
       setValue(
         "active_customer_status",
-        customer.data.customer.active_customer_status?true:false
+        customer.data.customer.active_customer_status ? true : false
       );
     }
   }, [customer, setValue]);
 
-
   const onSubmit: SubmitHandler<customerUpdateForm> = async (data) => {
     try {
-
-      await updateCustomerInfo({...data,customer_id,active_customer_status:data.active_customer_status?1:0});
-      alert("Customer updated successfully")
+      await updateCustomerInfo({
+        ...data,
+        customer_id,
+        active_customer_status: data.active_customer_status ? 1 : 0,
+      });
+      alert("Customer updated successfully");
+      router.push("/customers");
     } catch (error) {
-      alert("Failed to update customer")
+      alert("Failed to update customer");
     }
   };
 
@@ -76,7 +78,8 @@ function page() {
       {customer?.data && customer.data.customer ? (
         <>
           <p className="text-4xl font-bold text-customBlue ">
-            Edit {customer.data.customer.customer_first_name}{" "} {customer.data.customer.customer_last_name}
+            Edit {customer.data.customer.customer_first_name}{" "}
+            {customer.data.customer.customer_last_name}
             <span className=" inline-block ml-3 w-12 h-[2px] bg-customeRed"></span>
           </p>
 
@@ -134,15 +137,19 @@ function page() {
                 {errors.customer_phone_number.message}
               </p>
             )}
-           <label className='block mb-4'>
+            <label className="block mb-4">
               <input
                 {...register("active_customer_status")}
-                type='checkbox'
-                className='mr-2'
+                type="checkbox"
+                className="mr-2"
               />
               Active Customer
             </label>
-            {errors.active_customer_status && <p className='text-red-500'>{errors.active_customer_status.message}</p>}
+            {errors.active_customer_status && (
+              <p className="text-red-500">
+                {errors.active_customer_status.message}
+              </p>
+            )}
             <button
               disabled={isSubmitting}
               className="bg-customeRed px-5 py-3 text-white "

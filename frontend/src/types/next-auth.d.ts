@@ -5,7 +5,7 @@ declare module "next-auth" {
     employee_id: number;
     employee_email: string;
     employee_first_name: string;
-    employee_role: number;
+    employee_role: string;
     token: string;
   }
 
@@ -14,16 +14,8 @@ declare module "next-auth" {
       employee_id: number;
       employee_email: string;
       employee_first_name: string;
-      employee_role: number;
+      employee_role: string;
       token: string;
     };
-  }
-
-  interface JWT {
-    employee_id: number;
-    employee_email: string;
-    employee_first_name: string;
-    employee_role: number;
-    token: string;
   }
 }

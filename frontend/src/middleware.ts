@@ -1,8 +1,8 @@
-import { NextResponse,NextRequest } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
 import { auth } from "./auth";
 
-export async function middleware(req:NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Public routes
@@ -15,11 +15,10 @@ export async function middleware(req:NextRequest) {
 
   // Check for a valid session on protected routes
   const session = await auth();
-  
 
   if (!session) {
     console.log("Unauthorized access, redirecting to login...");
-    const signInUrl=new URL("/signin", req.url)
+    const signInUrl = new URL("/signin", req.url);
     signInUrl.searchParams.set("callbackUrl", req.url);
     return NextResponse.redirect(signInUrl);
   }
@@ -29,10 +28,8 @@ export async function middleware(req:NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|.*\\..*).*)"], 
+  matcher: ["/dashboard/:path*", "/addCustomer/:path*"],
 };
-
-
 
 // "employee_email": "update@gmail.com",
 //  "employee_password": "8HYsy&^uud*7hh"
