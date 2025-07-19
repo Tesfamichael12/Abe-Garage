@@ -83,7 +83,7 @@ async function createOrder(order) {
     return true;
   } catch (error) {
     connection.rollback();
-    console.log("Error creating order", error.message);
+    console.error("Error creating order in service:", error);
     return false;
   } finally {
     connection.release();
@@ -314,10 +314,23 @@ async function getCustomerOrders(id) {
     throw new Error("Error getting customer orders");
   }
 }
+
+async function updateOrderStatus(order_id, order_status) {
+  try {
+    const sql = "UPDATE order_status SET order_status = ? WHERE order_id = ?";
+    const result = await query(sql, [order_status, order_id]);
+    return result.affectedRows === 1;
+  } catch (error) {
+    console.error("Error updating order status in service:", error);
+    throw new Error("Error updating order status");
+  }
+}
+
 module.exports = {
   createOrder,
   getOrders,
   getOrderByHash,
   updateOrder,
   getCustomerOrders,
+  updateOrderStatus,
 };
