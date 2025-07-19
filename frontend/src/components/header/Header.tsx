@@ -18,7 +18,7 @@ function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 200) {
+      if (window.scrollY > 64) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
@@ -66,7 +66,9 @@ function Header() {
             <p>Enjoy the Beso while we fix your car</p>
           </div>
           <div className="hidden md:flex flex-grow justify-between items-center bg-customBlue text-white p-3 md:p-4 md:px-5">
-            <p className="text-md font-jost">Monday - Saturday 7:00AM - 6:00PM</p>
+            <p className="text-md font-jost">
+              Monday - Saturday 7:00AM - 6:00PM
+            </p>
             <p className="hidden lg:block text-md">
               Schedule Appointment:{" "}
               <span className="font-bold text-lg md:text-xl lg:text-2xl font-jost">

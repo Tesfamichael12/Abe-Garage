@@ -12,7 +12,7 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="bg-[#081336] text-gray-300 mt-24">
+    <footer className="bg-[#081336] text-gray-300">
       {/* Top Contact Bar */}
       <div className="py-6 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
