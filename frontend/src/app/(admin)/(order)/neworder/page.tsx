@@ -13,9 +13,17 @@ import ServiceSelection from "@/components/services/ServiceSelection";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { PulseLoader } from "react-spinners";
+import { FiUser, FiTruck, FiSettings, FiCheckCircle } from "react-icons/fi";
+
+const steps = [
+  { id: 1, name: "Find Customer", icon: FiUser },
+  { id: 2, name: "Select Vehicle", icon: FiTruck },
+  { id: 3, name: "Add Services", icon: FiSettings },
+  { id: 4, name: "Confirm Order", icon: FiCheckCircle },
+];
 
 function NewOrderPage() {
-  const [step, setStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(1);
   const [keyword, setKeyword] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
@@ -52,37 +60,38 @@ function NewOrderPage() {
   const vehicles = useMemo(() => vehiclesResult?.data || [], [vehiclesResult]);
 
   const handleNextStep = () => {
-    if (step === 1 && !selectedCustomer) {
+    if (currentStep === 1 && !selectedCustomer) {
       setErrorMessage("Please select a customer to continue.");
       return;
     }
-    if (step === 2 && !selectedVehicle) {
+    if (currentStep === 2 && !selectedVehicle) {
       setErrorMessage("Please select a vehicle to continue.");
       return;
     }
+    if (currentStep === 3) {
+      if (price === "" || price <= 0) {
+        setErrorMessage("Order price must be provided and greater than 0.");
+        return;
+      }
+      if (selectedServices.length === 0 && !additionalRequest) {
+        setErrorMessage(
+          "Please select at least one service or provide an additional request."
+        );
+        return;
+      }
+    }
     setErrorMessage(null);
-    setStep((prev) => prev + 1);
+    setCurrentStep((prev) => prev + 1);
   };
 
-  const handlePrevStep = () => setStep((prev) => prev - 1);
+  const handlePrevStep = () => setCurrentStep((prev) => prev - 1);
 
   const handleSubmitOrder = async () => {
-    if (price === "" || price <= 0) {
-      setErrorMessage("Order price must be provided and greater than 0.");
-      return;
-    }
-    if (selectedServices.length === 0 && !additionalRequest) {
-      setErrorMessage(
-        "Please select at least one service or provide an additional request."
-      );
-      return;
-    }
-
     const newOrder: CreateOrderRequest = {
       employee_id: employee_id!,
       customer_id: selectedCustomer!.customer_id,
       vehicle_id: selectedVehicle!.vehicle_id!,
-      order_total_price: price,
+      order_total_price: price as number,
       additional_request: additionalRequest || undefined,
       order_services: selectedServices.map((service_id) => ({ service_id })),
     };
@@ -96,182 +105,158 @@ function NewOrderPage() {
     }
   };
 
-  const renderStep = () => {
-    switch (step) {
+  const renderStepContent = () => {
+    switch (currentStep) {
       case 1:
         return (
           <div>
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-              Step 1: Find Customer
-            </h2>
-            <div className="relative">
+            <div className="relative mb-4">
+              <HiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
               <input
                 type="text"
-                className="w-full border border-gray-300 p-4 rounded-md pr-10 focus:ring-2 focus:ring-customBlue"
-                placeholder="Search by name or email..."
+                className="w-full border border-gray-300 p-4 pl-12 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                placeholder="Search by name, email, or phone..."
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
               />
-              <HiSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
             </div>
-
             {isCustomerLoading && (
-              <p className="mt-4 text-gray-600">Searching...</p>
+              <div className="text-center p-4">Searching...</div>
             )}
             {customerError && (
               <p className="mt-4 text-red-500">Error fetching customers.</p>
             )}
-            {customers.length > 0 && (
-              <div className="mt-4 overflow-x-auto">
-                <table className="min-w-full bg-white border">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="py-2 px-4 border-b">Name</th>
-                      <th className="py-2 px-4 border-b">Email</th>
-                      <th className="py-2 px-4 border-b">Phone</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {customers.map((customer) => (
-                      <tr
-                        key={customer.customer_id}
-                        onClick={() => setSelectedCustomer(customer)}
-                        className={`cursor-pointer hover:bg-customBlue hover:text-white ${
-                          selectedCustomer?.customer_id === customer.customer_id
-                            ? "bg-customBlue text-white"
-                            : ""
-                        }`}
-                      >
-                        <td className="py-2 px-4 border-b">{`${customer.customer_first_name} ${customer.customer_last_name}`}</td>
-                        <td className="py-2 px-4 border-b">
-                          {customer.customer_email}
-                        </td>
-                        <td className="py-2 px-4 border-b">
-                          {customer.customer_phone_number}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <div className="space-y-2">
+              {customers.map((customer) => (
+                <div
+                  key={customer.customer_id}
+                  onClick={() => setSelectedCustomer(customer)}
+                  className={`cursor-pointer p-4 rounded-lg border ${
+                    selectedCustomer?.customer_id === customer.customer_id
+                      ? "bg-red-500 text-white"
+                      : "bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <p className="font-semibold">{`${customer.customer_first_name} ${customer.customer_last_name}`}</p>
+                  <p className="text-sm">{customer.customer_email}</p>
+                </div>
+              ))}
+            </div>
           </div>
         );
       case 2:
         return (
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-              Step 2: Select Vehicle for {selectedCustomer?.customer_first_name}
-            </h2>
+          <div className="space-y-2">
             {isVehicleLoading && (
-              <p className="mt-4 text-gray-600">Loading vehicles...</p>
+              <div className="text-center p-4">Loading vehicles...</div>
             )}
             {vehicleError && (
               <p className="mt-4 text-red-500">Error fetching vehicles.</p>
             )}
-            {vehicles.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="py-2 px-4 border-b">Year</th>
-                      <th className="py-2 px-4 border-b">Make</th>
-                      <th className="py-2 px-4 border-b">Model</th>
-                      <th className="py-2 px-4 border-b">Tag</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {vehicles.map((vehicle) => (
-                      <tr
-                        key={vehicle.vehicle_id}
-                        onClick={() => setSelectedVehicle(vehicle)}
-                        className={`cursor-pointer hover:bg-customBlue hover:text-white ${
-                          selectedVehicle?.vehicle_id === vehicle.vehicle_id
-                            ? "bg-customBlue text-white"
-                            : ""
-                        }`}
-                      >
-                        <td className="py-2 px-4 border-b">
-                          {vehicle.vehicle_year}
-                        </td>
-                        <td className="py-2 px-4 border-b">
-                          {vehicle.vehicle_make}
-                        </td>
-                        <td className="py-2 px-4 border-b">
-                          {vehicle.vehicle_model}
-                        </td>
-                        <td className="py-2 px-4 border-b">
-                          {vehicle.vehicle_tag}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            {vehicles.map((vehicle) => (
+              <div
+                key={vehicle.vehicle_id}
+                onClick={() => setSelectedVehicle(vehicle)}
+                className={`cursor-pointer p-4 rounded-lg border ${
+                  selectedVehicle?.vehicle_id === vehicle.vehicle_id
+                    ? "bg-red-500 text-white"
+                    : "bg-white hover:bg-gray-50"
+                }`}
+              >
+                <p className="font-semibold">{`${vehicle.vehicle_year} ${vehicle.vehicle_make} ${vehicle.vehicle_model}`}</p>
+                <p className="text-sm">Tag: {vehicle.vehicle_tag}</p>
               </div>
-            ) : (
-              <p className="mt-4 text-gray-600">
-                No vehicles found for this customer.
-              </p>
-            )}
+            ))}
           </div>
         );
       case 3:
         return (
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-              Step 3: Add Services & Details
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-4 font-jost">
+                Select Services
+              </h3>
+              <ServiceSelection
+                selectedServices={selectedServices}
+                onServiceSelect={(id) =>
+                  setSelectedServices((prev) =>
+                    prev.includes(id)
+                      ? prev.filter((i) => i !== id)
+                      : [...prev, id]
+                  )
+                }
+              />
+            </div>
+            <div>
+              <div className="mb-4">
+                <label
+                  htmlFor="additionalRequest"
+                  className="block text-lg font-medium text-gray-700 font-jost"
+                >
+                  Additional Requests
+                </label>
+                <textarea
+                  id="additionalRequest"
+                  rows={4}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+                  value={additionalRequest}
+                  onChange={(e) => setAdditionalRequest(e.target.value)}
+                />
+              </div>
               <div>
-                <ServiceSelection
-                  selectedServices={selectedServices}
-                  onServiceSelect={(id) =>
-                    setSelectedServices((prev) =>
-                      prev.includes(id)
-                        ? prev.filter((i) => i !== id)
-                        : [...prev, id]
+                <label
+                  htmlFor="price"
+                  className="block text-lg font-medium text-gray-700 font-jost"
+                >
+                  Total Price ($)
+                </label>
+                <input
+                  id="price"
+                  type="number"
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+                  value={price}
+                  onChange={(e) =>
+                    setPrice(
+                      e.target.value === "" ? "" : parseFloat(e.target.value)
                     )
                   }
                 />
               </div>
+            </div>
+          </div>
+        );
+      case 4:
+        return (
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <h3 className="text-2xl font-bold text-gray-800 font-jost mb-4">
+              Order Summary
+            </h3>
+            <div className="space-y-4">
               <div>
-                <div className="mb-4">
-                  <label
-                    htmlFor="additionalRequest"
-                    className="block text-lg font-medium text-gray-700"
-                  >
-                    Additional Requests
-                  </label>
-                  <textarea
-                    id="additionalRequest"
-                    rows={4}
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-customBlue"
-                    value={additionalRequest}
-                    onChange={(e) => setAdditionalRequest(e.target.value)}
-                    placeholder="e.g., Check for noise in the front right wheel."
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="price"
-                    className="block text-lg font-medium text-gray-700"
-                  >
-                    Total Price ($)
-                  </label>
-                  <input
-                    type="number"
-                    id="price"
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-customBlue"
-                    value={price}
-                    onChange={(e) =>
-                      setPrice(
-                        e.target.value === "" ? "" : parseFloat(e.target.value)
-                      )
-                    }
-                    placeholder="Enter total price"
-                  />
-                </div>
+                <p className="text-sm text-gray-500">Customer</p>
+                <p className="font-semibold">
+                  {selectedCustomer?.customer_first_name}{" "}
+                  {selectedCustomer?.customer_last_name}
+                </p>
               </div>
+              <div>
+                <p className="text-sm text-gray-500">Vehicle</p>
+                <p className="font-semibold">
+                  {selectedVehicle?.vehicle_year}{" "}
+                  {selectedVehicle?.vehicle_make}{" "}
+                  {selectedVehicle?.vehicle_model}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Total Price</p>
+                <p className="font-semibold text-2xl text-red-600">${price}</p>
+              </div>
+              {additionalRequest && (
+                <div>
+                  <p className="text-sm text-gray-500">Additional Requests</p>
+                  <p className="font-semibold">{additionalRequest}</p>
+                </div>
+              )}
             </div>
           </div>
         );
@@ -281,61 +266,91 @@ function NewOrderPage() {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <p className="text-3xl font-bold text-customBlue mb-2">
-          Create New Order
-        </p>
-        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
-          <div
-            className="bg-customBlue h-2.5 rounded-full"
-            style={{ width: `${(step / 3) * 100}%` }}
-          ></div>
-        </div>
-
-        {renderStep()}
-
-        {errorMessage && (
-          <p className="mt-4 text-red-500 text-center font-semibold">
-            {errorMessage}
-          </p>
-        )}
-
-        <div className="mt-8 flex justify-between">
-          {step > 1 && (
-            <button
-              onClick={handlePrevStep}
-              className="flex items-center bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition"
+    <div className="p-4 sm:p-6 lg:p-8">
+      <h1 className="text-3xl font-bold text-gray-800 font-jost mb-8">
+        Create New Order
+      </h1>
+      <div className="mb-8">
+        <ol className="flex items-center w-full">
+          {steps.map((step, index) => (
+            <li
+              key={step.id}
+              className={`flex items-center ${
+                index < steps.length - 1 ? "w-full" : ""
+              }`}
             >
-              <HiArrowLeft className="mr-2" /> Previous
-            </button>
-          )}
-
-          <div className="flex-grow"></div>
-
-          {step < 3 && (
-            <button
-              onClick={handleNextStep}
-              className="flex items-center bg-customBlue text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition"
-            >
-              Next <HiArrowRight className="ml-2" />
-            </button>
-          )}
-
-          {step === 3 && (
-            <button
-              onClick={handleSubmitOrder}
-              disabled={isLoading}
-              className="bg-customeRed text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition"
-            >
-              {isLoading ? (
-                <PulseLoader size={8} color="#fff" />
-              ) : (
-                "Submit Order"
+              <div className="flex items-center">
+                <span
+                  className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                    currentStep > step.id
+                      ? "bg-red-600 text-white"
+                      : currentStep === step.id
+                      ? "bg-red-500 text-white"
+                      : "bg-gray-200 text-gray-500"
+                  }`}
+                >
+                  {currentStep > step.id ? <FiCheckCircle /> : <step.icon />}
+                </span>
+                <span
+                  className={`ml-4 font-medium ${
+                    currentStep >= step.id ? "text-gray-800" : "text-gray-500"
+                  }`}
+                >
+                  {step.name}
+                </span>
+              </div>
+              {index < steps.length - 1 && (
+                <div
+                  className={`flex-auto border-t-2 mx-4 ${
+                    currentStep > step.id ? "border-red-600" : "border-gray-200"
+                  }`}
+                ></div>
               )}
-            </button>
-          )}
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div className="bg-white p-8 rounded-lg shadow-md min-h-[300px]">
+        {renderStepContent()}
+      </div>
+
+      {errorMessage && (
+        <div className="mt-4 text-center text-red-500 bg-red-100 p-3 rounded-lg">
+          {errorMessage}
         </div>
+      )}
+
+      <div className="mt-8 flex justify-between">
+        <button
+          onClick={handlePrevStep}
+          disabled={currentStep === 1}
+          className="flex items-center px-6 py-3 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+        >
+          <HiArrowLeft className="mr-2" />
+          Previous
+        </button>
+        {currentStep < 4 ? (
+          <button
+            onClick={handleNextStep}
+            className="flex items-center px-6 py-3 rounded-lg bg-red-500 text-white hover:bg-red-600"
+          >
+            Next
+            <HiArrowRight className="ml-2" />
+          </button>
+        ) : (
+          <button
+            onClick={handleSubmitOrder}
+            disabled={isLoading}
+            className="flex items-center px-6 py-3 rounded-lg bg-green-500 text-white hover:bg-green-600 disabled:bg-green-300"
+          >
+            {isLoading ? (
+              <PulseLoader size={10} color="#fff" />
+            ) : (
+              "Submit Order"
+            )}
+          </button>
+        )}
       </div>
     </div>
   );

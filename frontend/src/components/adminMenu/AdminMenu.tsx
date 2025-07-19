@@ -3,29 +3,30 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import {
-  FaTachometerAlt,
-  FaUsers,
-  FaBoxOpen,
-  FaUserPlus,
-  FaUserTie,
-  FaWrench,
-  FaBars,
-} from "react-icons/fa"; // Icons
+  FiGrid,
+  FiUsers,
+  FiShoppingBag,
+  FiUserPlus,
+  FiUserCheck,
+  FiSettings,
+  FiMenu,
+  FiPackage,
+} from "react-icons/fi";
 
 const menuItems = [
-  { name: "Dashboard", href: "/dashboard", icon: FaTachometerAlt },
-  { name: "Orders", href: "/orders", icon: FaBoxOpen },
-  { name: "New Order", href: "/neworder", icon: FaBoxOpen },
-  { name: "Add Employee", href: "/addEmployee", icon: FaUserPlus },
-  { name: "Employees", href: "/employees", icon: FaUsers },
-  { name: "Add Customer", href: "/addCustomer", icon: FaUserTie },
-  { name: "Customers", href: "/customers", icon: FaUsers },
-  { name: "Services", href: "/Services", icon: FaWrench },
+  { name: "Dashboard", href: "/dashboard", icon: FiGrid },
+  { name: "Orders", href: "/orders", icon: FiShoppingBag },
+  { name: "New Order", href: "/neworder", icon: FiPackage },
+  { name: "Employees", href: "/employees", icon: FiUsers },
+  { name: "Add Employee", href: "/addEmployee", icon: FiUserPlus },
+  { name: "Customers", href: "/customers", icon: FiUsers },
+  { name: "Add Customer", href: "/addCustomer", icon: FiUserCheck },
+  { name: "Services", href: "/Services", icon: FiSettings },
 ];
 
 const AdminMenu = () => {
   const { data: session } = useSession();
-  const [isMenuOpen, setIsMenuOpen] = useState(true); // Sidebar state
+  const [isMenuOpen, setIsMenuOpen] = useState(true);
 
   if (!session) {
     return null;
@@ -33,29 +34,35 @@ const AdminMenu = () => {
 
   return (
     <div
-      className={`bg-blue-950 text-white h-screen flex flex-col transition-all duration-300 ${
+      className={`bg-gray-900 text-gray-300 h-full flex flex-col transition-all duration-300 ${
         isMenuOpen ? "w-64" : "w-20"
       }`}
     >
-      {/* Header + Toggle Button */}
-      <div className="flex items-center justify-between p-4">
-        {isMenuOpen && <h1 className="text-2xl font-bold">Admin</h1>}
-        <FaBars
-          className="text-white text-2xl cursor-pointer hover:scale-110 transition"
+      <div
+        className={`flex items-center p-4 border-b border-gray-800 ${
+          isMenuOpen ? "justify-between" : "justify-center"
+        }`}
+      >
+        {isMenuOpen && (
+          <h1 className="text-2xl font-bold font-jost text-white">Admin</h1>
+        )}
+        <FiMenu
+          className="text-white text-2xl cursor-pointer hover:text-red-500 transition-colors"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         />
       </div>
 
-      {/* Menu Items */}
-      <ul className="flex-1 mt-5 space-y-2">
+      <ul className="flex-1 mt-5 space-y-2 px-4">
         {menuItems.map(({ name, href, icon: Icon }) => (
           <li key={name}>
             <Link
               href={href}
-              className="flex items-center space-x-3 p-3 hover:bg-blue-800 rounded-md"
+              className="flex items-center space-x-3 p-3 hover:bg-gray-800 hover:text-white rounded-md transition-colors"
             >
               <Icon className="text-xl" />
-              {isMenuOpen && <span className="text-sm">{name}</span>}
+              {isMenuOpen && (
+                <span className="text-sm font-medium">{name}</span>
+              )}
             </Link>
           </li>
         ))}

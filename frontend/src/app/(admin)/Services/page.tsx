@@ -1,135 +1,191 @@
-"use client"
-import React,{useState} from 'react'
-import { FaUserEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+"use client";
+import React, { useState } from "react";
+import { FiEdit, FiTrash2, FiPlusCircle } from "react-icons/fi";
 import { PulseLoader } from "react-spinners";
-import { useGetServicesQuery,useCreateServiceMutation,useDeleteServiceMutation,useUpdateServiceMutation } from '@/features/api/apiSlice';
-import ConfirmationModal from '@/components/ConfirmationModal';
-import { useRouter } from 'next/navigation';
+import {
+  useGetServicesQuery,
+  useCreateServiceMutation,
+  useDeleteServiceMutation,
+} from "@/features/api/apiSlice";
+import ConfirmationModal from "@/components/ConfirmationModal";
+import { useRouter } from "next/navigation";
 
+function ServicesPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [serviceId, setServiceId] = useState<number | null>(null);
+  const [serviceName, setServiceName] = useState("");
+  const [serviceDescription, setServiceDescription] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-function page() {
-  const [isModalOpen,setIsModalOpen]=useState(false)
-const [serviceId,setServiceId] = useState<number | null>(null)
-    const [serviceName,setServiceName] = useState('')
-    const [serviceDescription,setServiceDescription] = useState('')
-    const [errorMessage,setErrorMessage] = useState('')
+  const router = useRouter();
 
-    const router=useRouter()
+  const { data: servicesData, isLoading: isLoadingServices } =
+    useGetServicesQuery();
+  const [createService, { isLoading: isCreating }] = useCreateServiceMutation();
+  const [deleteService] = useDeleteServiceMutation();
 
-    const {data:services} = useGetServicesQuery()
-    const [createService,{isLoading}] = useCreateServiceMutation()
-    const [deleteService] = useDeleteServiceMutation()
-    const [updateService] = useUpdateServiceMutation()
+  const services = servicesData?.services ?? [];
 
-    const handlesSubmit=async ()=>{
-        if(!serviceName || !serviceDescription){
-            setErrorMessage('Please fill in all fields')
-            return
-        }
-
-        try {
-setErrorMessage('')
-            await createService({service_name:serviceName,service_description:serviceDescription}).unwrap()
-            alert('Service created successfully')
-            
-        } catch (error) {
-            console.log(error)
-            setErrorMessage("sorry,something went wrong. Please try again")
-            
-        }
-        
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!serviceName || !serviceDescription) {
+      setErrorMessage("Please fill in all fields.");
+      return;
     }
 
-  const onConfirm = async () => {
-    
-if(serviceId!==null){   
-
     try {
-      await deleteService({service_id:serviceId}).unwrap();
-      setIsModalOpen(false);
-      setServiceId(null);
-      alert('Service deleted successfully')
-      
+      setErrorMessage("");
+      await createService({
+        service_name: serviceName,
+        service_description: serviceDescription,
+      }).unwrap();
+      setServiceName("");
+      setServiceDescription("");
     } catch (error) {
-      console.log(error);
-      alert('Sorry, something went wrong. Please try again')
-      
-    }}
+      console.error(error);
+      setErrorMessage("Sorry, something went wrong. Please try again.");
+    }
+  };
 
-  }
+  const onConfirmDelete = async () => {
+    if (serviceId !== null) {
+      try {
+        await deleteService({ service_id: serviceId }).unwrap();
+        setIsModalOpen(false);
+        setServiceId(null);
+      } catch (error) {
+        console.error(error);
+        alert("Sorry, something went wrong. Please try again.");
+      }
+    }
+  };
 
-  const handleDeleteClick = (serviceId: number) => {
-    setServiceId(serviceId);
+  const handleDeleteClick = (id: number) => {
+    setServiceId(id);
     setIsModalOpen(true);
-  }
-  return (
-    <div className='md:mx-20' >
-         <p className="text-4xl font-bold text-customBlue mb-10">
-        Services we provides
-        <span className=" inline-block ml-3 w-8 h-[2px] bg-customeRed"></span>
-      </p>
+  };
 
-  { ( services?.services && services.services.length >0) && services.services.map((services,index)=>(
-    <div
-    key={index}
-        className=" my-5 flex items-center justify-between p-4 border rounded-lg shadow-sm hover:shadow-md transition"
-      >
-        <div className='w-4/5'>
-          <h3 className="text-lg text-customBlue font-bold">{services.service_name}</h3>
-          <p className="text-base text-gray-800">{services.service_description}</p>
+  return (
+    <div className="p-4 sm:p-6 lg:p-8">
+      <h1 className="text-3xl font-bold text-gray-800 font-jost mb-8">
+        Manage Services
+      </h1>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-gray-700 font-jost mb-4">
+              Available Services
+            </h2>
+            {isLoadingServices ? (
+              <div className="text-center">
+                <PulseLoader color="#4A90E2" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {services.map((service) => (
+                  <div
+                    key={service.service_id}
+                    className="flex items-center justify-between p-4 border rounded-lg hover:shadow-lg transition-shadow"
+                  >
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {service.service_name}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        {service.service_description}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <button
+                        onClick={() =>
+                          router.push(`Services/edit/${service.service_id}`)
+                        }
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        <FiEdit size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(service.service_id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        <FiTrash2 size={18} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-        <div className='flex gap-10 items-center'>
-            <FaUserEdit size={30} className='cursor-pointer' onClick={()=>router.push(`Services/edit/${services.service_id}`)} />
-            <MdDelete size={30} className='text-customeRed cursor-pointer' onClick={()=>handleDeleteClick(services.service_id)} />
+
+        <div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-gray-700 font-jost mb-4">
+              Add New Service
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="serviceName"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Service Name
+                </label>
+                <input
+                  id="serviceName"
+                  type="text"
+                  value={serviceName}
+                  onChange={(e) => setServiceName(e.target.value)}
+                  placeholder="e.g., Oil Change"
+                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="serviceDescription"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Description
+                </label>
+                <textarea
+                  id="serviceDescription"
+                  value={serviceDescription}
+                  onChange={(e) => setServiceDescription(e.target.value)}
+                  placeholder="Describe the service..."
+                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+                  rows={4}
+                />
+              </div>
+              {errorMessage && (
+                <p className="text-red-500 text-sm">{errorMessage}</p>
+              )}
+              <button
+                type="submit"
+                className="w-full flex justify-center items-center px-6 py-3 rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:bg-red-300"
+                disabled={isCreating}
+              >
+                {isCreating ? (
+                  <PulseLoader size={10} color="#fff" />
+                ) : (
+                  <>
+                    <FiPlusCircle className="mr-2" /> Add Service
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
         </div>
-        
       </div>
 
-  )) 
-  }
-
-      <div className="shadow-md rounded-sm  border border-gray-200 my-5  px-4 py-5">
-      
-        
-        <p className="text-4xl font-bold text-customBlue my-10">
-      Add a new service         
-       <span className="inline-block ml-3 w-10 h-[2px] bg-customeRed"></span>
-                </p>
-
-
-            <input
-        type="text"
-        inputMode="numeric"
-        value={serviceName}
-        onChange={(e) => setServiceName(e.target.value)}
-        pattern="[0-9]*"
-        placeholder="Service name"
-        className="w-full p-2 my-5 border rounded-md focus:ring focus:ring-blue-300 appearance-none"
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={onConfirmDelete}
+        message="Are you sure you want to delete this service?"
       />
-      
-                <textarea
-                value={serviceDescription}
-                onChange={(e) => setServiceDescription(e.target.value)}
-              placeholder="Service description"
-              className="w-full p-2 mt-1 border rounded-md focus:ring focus:ring-blue-300"
-              rows={3}
-            />
-      
-      {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
-
-      <button className=" px-10 py-4 mt-5 text-white bg-customeRed rounded-md" onClick={handlesSubmit} disabled={isLoading}>
-             {isLoading ? <PulseLoader size={8} color="#fff" /> : "Create Order"}
-            </button>
-              </div>
-<ConfirmationModal
-isOpen={isModalOpen}
-onClose={() => setIsModalOpen(false)}
-onConfirm={onConfirm}
-message='Are you sure you want to delete this service?'
-/>
     </div>
-  )
+  );
 }
 
-export default page
+export default ServicesPage;

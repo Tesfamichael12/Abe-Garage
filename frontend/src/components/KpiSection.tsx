@@ -1,49 +1,55 @@
-"use client"
-import { useGetKpisQuery } from "@/features/api/apiSlice"
-import { FaUsers } from "react-icons/fa"
-import { MdShoppingCart } from "react-icons/md";
-import { FaDollarSign } from "react-icons/fa";
+"use client";
+import { useGetKpisQuery } from "@/features/api/apiSlice";
+import { FaUsers, FaShoppingCart, FaDollarSign } from "react-icons/fa";
+import { IconType } from "react-icons";
 
-
-function KpiSection() {
-
-    const {data:kpiData,isLoading,error} = useGetKpisQuery()
-    console.log("kpi",kpiData)
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-      <div className="bg-white p-6 rounded-2xl shadow-full flex justify-between items-center transform transition-all duration-300 ease-in-out hover:scale-105 hover:translate-x-2 hover:translate-y-2">
-        <div><h3 className="text-lg font-semibold text-gray-700">Total Customers</h3>
-        <p className="text-3xl font-bold">{kpiData?.total_customers || 0}</p></div>
-        <div className="p-5 bg-gray-100 rounded-full flex items-center justify-center">
-        <FaUsers size={32} />
-
-        </div>
-      </div>
-     
-      <div className="bg-white p-6 rounded-2xl shadow-full flex justify-between items-center transform transition-all duration-300 ease-in-out hover:scale-105 hover:translate-x-2 hover:translate-y-2">
-        <div>
-        <h3 className="text-lg font-semibold text-gray-700">Active Orders</h3>
-        <p className="text-3xl font-bold">{kpiData?.active_orders || 0}</p>
-        </div>
-        <div className="p-5 bg-gray-100 rounded-full flex items-center justify-center">
-        <MdShoppingCart size={32}/>
-
-        </div>
-        
-      </div>
-      <div className="bg-white p-6 rounded-2xl shadow-full flex justify-between items-center transform transition-all duration-300 ease-in-out hover:scale-105 hover:translate-x-2 hover:translate-y-2">
-        <div>
-        <h3 className="text-lg font-semibold text-gray-700">Total Revenue</h3>
-        <p className="text-3xl font-bold">${kpiData?.total_revenue || 0}</p>
-        </div>
-        <div className="p-5 bg-gray-100 rounded-full flex items-center justify-center">
-        <FaDollarSign size={32}/>
-
-        </div>
-      </div>
-    </div>
-  )
+interface KpiCardProps {
+  Icon: IconType;
+  title: string;
+  value: string | number;
+  color: string;
 }
 
-export default KpiSection
+const KpiCard: React.FC<KpiCardProps> = ({ Icon, title, value, color }) => (
+  <div className="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+    <div className={`p-3 rounded-full ${color}`}>
+      <Icon size={24} className="text-white" />
+    </div>
+    <div>
+      <p className="text-sm text-gray-500 font-jost">{title}</p>
+      <p className="text-2xl font-bold text-gray-800">{value}</p>
+    </div>
+  </div>
+);
+
+function KpiSection() {
+  const { data: kpiData, isLoading, error } = useGetKpisQuery();
+
+  if (isLoading) return <div>Loading KPIs...</div>;
+  if (error) return <div>Error loading KPIs.</div>;
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <KpiCard
+        Icon={FaUsers}
+        title="Total Customers"
+        value={kpiData?.total_customers ?? 0}
+        color="bg-blue-500"
+      />
+      <KpiCard
+        Icon={FaShoppingCart}
+        title="Active Orders"
+        value={kpiData?.active_orders ?? 0}
+        color="bg-yellow-500"
+      />
+      <KpiCard
+        Icon={FaDollarSign}
+        title="Total Revenue"
+        value={`$${(kpiData?.total_revenue ?? 0).toLocaleString()}`}
+        color="bg-green-500"
+      />
+    </div>
+  );
+}
+
+export default KpiSection;

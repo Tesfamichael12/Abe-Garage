@@ -7,18 +7,11 @@ export default function AdminLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex h-screen bg-gray-100">
-    {/* Admin Sidebar */}
-    <AdminMenu />
-
-    <div className="flex flex-col flex-grow overflow-hidden">
-     
-
-      {/* Dashboard Content */}
-      <main className="p-6 flex-grow overflow-auto">{children}</main>
-
-    
+    <div className="flex bg-gray-100 min-h-screen">
+      <div className="sticky top-[70px] h-[calc(100vh-70px)]">
+        <AdminMenu />
+      </div>
+      <main className="flex-grow">{children}</main>
     </div>
-  </div>
   );
 }

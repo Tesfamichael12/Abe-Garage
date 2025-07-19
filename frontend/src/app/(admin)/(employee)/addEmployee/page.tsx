@@ -4,134 +4,172 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { PulseLoader } from "react-spinners";
 import { addEmployeeRequest } from "@/types";
 import { useAddEmployeeMutation } from "@/features/api/apiSlice";
+import { useRouter } from "next/navigation";
+import { FiUserPlus } from "react-icons/fi";
 
-function Page() {
+function AddEmployeePage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [addEmployee, { isError }] = useAddEmployeeMutation();
+  const [addEmployee, { isLoading }] = useAddEmployeeMutation();
+  const router = useRouter();
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<addEmployeeRequest>();
 
   const onSubmit: SubmitHandler<addEmployeeRequest> = async (data) => {
     try {
       await addEmployee(data).unwrap();
-      setErrorMessage(null);
-      alert("Employee added successfully");
+      router.push("/employees");
     } catch (error: any) {
       console.error("Error during adding employee:", error);
-      if (error.data && error.data.message) {
-        setErrorMessage(error.data.message);
-      } else {
-        setErrorMessage("Something went wrong, please try again.");
-      }
+      setErrorMessage(
+        error.data?.message || "Something went wrong, please try again."
+      );
     }
   };
 
   return (
-    <div className="max-w-[1200px] mx-auto px-4 sm:px-10 my-10">
-      <p className="text-4xl font-bold text-customBlue">
-        Add a new employee
-        <span className="inline-block ml-3 w-12 h-[2px] bg-customeRed"></span>
-      </p>
-      <form className="mt-10" onSubmit={handleSubmit(onSubmit)}>
-        <input
-          {...register("employee_email", {
-            required: "Employee Email is required",
-            pattern: {
-              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-              message: "Invalid email address",
-            },
-          })}
-          className="block w-full sm:w-[50%] p-3 mb-5 border border-gray-200 rounded"
-          placeholder="Email"
-        />
-        {errors.employee_email && (
-          <p className="text-red-500">{errors.employee_email.message}</p>
-        )}
-
-        <input
-          {...register("employee_first_name", {
-            required: "Employee first name is required",
-          })}
-          className="block w-full sm:w-[50%] p-3 mb-5 border border-gray-200 rounded"
-          placeholder="Employee first name"
-          type="text"
-        />
-        {errors.employee_first_name && (
-          <p className="text-red-500">{errors.employee_first_name.message}</p>
-        )}
-
-        <input
-          {...register("employee_last_name", {
-            required: "Employee last name is required",
-          })}
-          className="block w-full sm:w-[50%] p-3 mb-5 border border-gray-200 rounded"
-          placeholder="Employee last name"
-          type="text"
-        />
-        {errors.employee_last_name && (
-          <p className="text-red-500">{errors.employee_last_name.message}</p>
-        )}
-
-        <input
-          {...register("employee_phone", {
-            required: "Employee phone number is required",
-          })}
-          className="block w-full sm:w-[50%] p-3 mb-5 border border-gray-200 rounded"
-          placeholder="Employee phone number"
-          type="text"
-        />
-        {errors.employee_phone && (
-          <p className="text-red-500">{errors.employee_phone.message}</p>
-        )}
-
-        <select
-          {...register("company_role_id", {
-            required: "Employee role is required",
-          })}
-          className="block w-full sm:w-[50%] p-3 mb-5 border border-gray-200 rounded font-semibold"
-        >
-          <option value={1}>Employee</option>
-          <option value={2}>Admin</option>
-        </select>
-        {errors.company_role_id && (
-          <p className="text-red-500">{errors.company_role_id.message}</p>
-        )}
-
-        <input
-          {...register("employee_password", {
-            required: "Employee password is required",
-            minLength: {
-              value: 8,
-              message: "Password must be at least 8 characters",
-            },
-          })}
-          className="block w-full sm:w-[50%] p-3 mb-5 border border-gray-200 rounded"
-          placeholder="Password"
-          type="password"
-        />
-        {errors.employee_password && (
-          <p className="text-red-500">{errors.employee_password.message}</p>
-        )}
-
-        <button
-          disabled={isSubmitting}
-          className="bg-customeRed px-5 py-3 text-white my-5"
-          type="submit"
-        >
-          {isSubmitting ? (
-            <PulseLoader size={8} color="#fff" />
-          ) : (
-            "ADD EMPLOYEE"
+    <div className="p-4 sm:p-6 lg:p-8">
+      <h1 className="text-3xl font-bold text-gray-800 font-jost mb-8">
+        Add New Employee
+      </h1>
+      <div className="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                First Name
+              </label>
+              <input
+                {...register("employee_first_name", {
+                  required: "First name is required",
+                })}
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+              />
+              {errors.employee_first_name && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.employee_first_name.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Last Name
+              </label>
+              <input
+                {...register("employee_last_name", {
+                  required: "Last name is required",
+                })}
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+              />
+              {errors.employee_last_name && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.employee_last_name.message}
+                </p>
+              )}
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              {...register("employee_email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: "Invalid email address",
+                },
+              })}
+              type="email"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+            />
+            {errors.employee_email && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.employee_email.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Phone Number
+            </label>
+            <input
+              {...register("employee_phone", {
+                required: "Phone number is required",
+              })}
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+            />
+            {errors.employee_phone && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.employee_phone.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Role
+            </label>
+            <select
+              {...register("company_role_id", { required: "Role is required" })}
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+            >
+              <option value={1}>Employee</option>
+              <option value={2}>Admin</option>
+            </select>
+            {errors.company_role_id && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.company_role_id.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              {...register("employee_password", {
+                required: "Password is required",
+                minLength: {
+                  value: 8,
+                  message: "Password must be at least 8 characters",
+                },
+              })}
+              type="password"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+            />
+            {errors.employee_password && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.employee_password.message}
+              </p>
+            )}
+          </div>
+          {errorMessage && (
+            <div className="text-center text-red-500 bg-red-100 p-3 rounded-lg">
+              {errorMessage}
+            </div>
           )}
-        </button>
-        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-      </form>
+          <div>
+            <button
+              disabled={isLoading}
+              className="w-full flex justify-center items-center px-6 py-3 rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:bg-red-300"
+              type="submit"
+            >
+              {isLoading ? (
+                <PulseLoader size={10} color="#fff" />
+              ) : (
+                <>
+                  <FiUserPlus className="mr-2" /> Add Employee
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
 
-export default Page;
+export default AddEmployeePage;

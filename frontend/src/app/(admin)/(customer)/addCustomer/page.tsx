@@ -5,8 +5,9 @@ import { PulseLoader } from "react-spinners";
 import { CustomerFormField } from "@/types";
 import { useAddCustomerMutation } from "@/features/api/apiSlice";
 import { useRouter } from "next/navigation";
+import { FiUserPlus } from "react-icons/fi";
 
-function Page() {
+function AddCustomerPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
   const [addCustomer, { isLoading }] = useAddCustomerMutation();
@@ -23,112 +24,116 @@ function Page() {
       router.push("/customers");
     } catch (error: any) {
       console.error("Error during adding customer:", error);
-      if (error.data && error.data.message) {
-        setErrorMessage(error.data.message);
-      } else {
-        setErrorMessage("Something went wrong, please try again.");
-      }
+      setErrorMessage(
+        error.data?.message || "Something went wrong, please try again."
+      );
     }
   };
 
   return (
-    <div className="max-w-[1200px] mx-auto px-10 mt-10">
-      <p className="text-4xl font-bold text-customBlue">
-        Add a new customer
-        <span className="inline-block ml-3 w-12 h-[2px] bg-customeRed"></span>
-      </p>
+    <div className="p-4 sm:p-6 lg:p-8">
+      <h1 className="text-3xl font-bold text-gray-800 font-jost mb-8">
+        Add New Customer
+      </h1>
+      <div className="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                First Name
+              </label>
+              <input
+                {...register("customer_first_name", {
+                  required: "First name is required",
+                })}
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+              />
+              {errors.customer_first_name && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.customer_first_name.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Last Name
+              </label>
+              <input
+                {...register("customer_last_name", {
+                  required: "Last name is required",
+                })}
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+              />
+              {errors.customer_last_name && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.customer_last_name.message}
+                </p>
+              )}
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              {...register("customer_email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: "Invalid email address",
+                },
+              })}
+              type="email"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+            />
+            {errors.customer_email && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.customer_email.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Phone Number
+            </label>
+            <input
+              {...register("customer_phone_number", {
+                required: "Phone number is required",
+              })}
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+            />
+            {errors.customer_phone_number && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.customer_phone_number.message}
+              </p>
+            )}
+          </div>
 
-      <form className="mt-10" onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <label htmlFor="customer_email" className="block mb-2">
-            Customer Email
-          </label>
-          <input
-            {...register("customer_email", {
-              required: "Customer Email is required",
-              pattern: {
-                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                message: "Invalid email address",
-              },
-            })}
-            className="block w-full sm:w-[50%] p-3 mb-5 border border-gray-200 rounded"
-            placeholder="Email"
-            type="email"
-            id="customer_email"
-          />
-          {errors.customer_email && (
-            <p className="text-red-500">{errors.customer_email.message}</p>
+          {errorMessage && (
+            <div className="text-center text-red-500 bg-red-100 p-3 rounded-lg">
+              {errorMessage}
+            </div>
           )}
-        </div>
 
-        <div>
-          <label htmlFor="customer_first_name" className="block mb-2">
-            First Name
-          </label>
-          <input
-            {...register("customer_first_name", {
-              required: "Customer first name is required",
-            })}
-            className="block w-full sm:w-[50%] p-3 mb-5 border border-gray-200 rounded"
-            placeholder="Customer first name"
-            type="text"
-            id="customer_first_name"
-          />
-          {errors.customer_first_name && (
-            <p className="text-red-500">{errors.customer_first_name.message}</p>
-          )}
-        </div>
-
-        <div>
-          <label htmlFor="customer_last_name" className="block mb-2">
-            Last Name
-          </label>
-          <input
-            {...register("customer_last_name", {
-              required: "Customer last name is required",
-            })}
-            className="block w-full sm:w-[50%] p-3 mb-5 border border-gray-200 rounded"
-            placeholder="Customer last name"
-            type="text"
-            id="customer_last_name"
-          />
-          {errors.customer_last_name && (
-            <p className="text-red-500">{errors.customer_last_name.message}</p>
-          )}
-        </div>
-
-        <div>
-          <label htmlFor="customer_phone_number" className="block mb-2">
-            Phone Number
-          </label>
-          <input
-            {...register("customer_phone_number", {
-              required: "Customer phone number is required",
-            })}
-            className="block w-full sm:w-[50%] p-3 mb-5 border border-gray-200 rounded"
-            placeholder="Customer phone number"
-            type="text"
-            id="customer_phone_number"
-          />
-          {errors.customer_phone_number && (
-            <p className="text-red-500">
-              {errors.customer_phone_number.message}
-            </p>
-          )}
-        </div>
-
-        <button
-          disabled={isLoading}
-          className="bg-customeRed px-5 py-3 text-white mt-5"
-          type="submit"
-        >
-          {isLoading ? <PulseLoader size={8} color="#fff" /> : "ADD CUSTOMER"}
-        </button>
-
-        {errorMessage && <p className="text-red-500 mt-4">{errorMessage}</p>}
-      </form>
+          <div>
+            <button
+              disabled={isLoading}
+              className="w-full flex justify-center items-center px-6 py-3 rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:bg-red-300"
+              type="submit"
+            >
+              {isLoading ? (
+                <PulseLoader size={10} color="#fff" />
+              ) : (
+                <>
+                  <FiUserPlus className="mr-2" /> Add Customer
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
 
-export default Page;
+export default AddCustomerPage;
