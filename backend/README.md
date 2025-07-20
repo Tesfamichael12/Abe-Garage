@@ -4,6 +4,11 @@
 
 ---
 
+## 🚀 Overview
+
+This backend provides a comprehensive API for managing all aspects of Abe's Garage operations, including employee management, customer records, vehicle servicing, and business analytics. It's designed to be secure, scalable, and easy to maintain.
+
+
 ## 🏛️ System Architecture
 
 The backend is built following a standard Model-View-Controller (MVC) architectural pattern, adapted for a headless API:
@@ -14,6 +19,17 @@ The backend is built following a standard Model-View-Controller (MVC) architectu
 - **Middlewares:** Provide a way to run code before the request reaches the controller. In this application, middleware is used for authentication and authorization, ensuring that only authenticated and authorized users can access protected endpoints.
 
 ---
+
+## 🗄️ Database Schema
+
+The backend uses a MySQL database with the following schema:
+
+
+![DB-schema-image](DB-schema-image.png)
+
+
+The database schema is designed to maintain referential integrity through foreign key constraints and supports the core business operations of the garage management system.
+
 
 ## Endpoints
 
