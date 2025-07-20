@@ -3,10 +3,9 @@ const app = express();
 const cors = require("cors");
 const helmet = require("helmet");
 const routes = require("./routes/index");
+const rateLimit = require("express-rate-limit");
 
-const allowedOrigins = [
-  "http://localhost:3000",
-];
+const allowedOrigins = ["http://localhost:3000"];
 
 const corsOptions = {
   origin: (origin, callback) => {
@@ -19,9 +18,17 @@ const corsOptions = {
   credentials: true,
 };
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100, 
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(helmet());
+app.use(limiter);
 
 app.use(routes);
 
