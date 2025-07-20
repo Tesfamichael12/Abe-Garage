@@ -37,7 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${bebasNeue.variable} ${jost.variable} ${lato.variable}`}
+        className={`${bebasNeue.variable} ${jost.variable} ${lato.variable} font-sans`}
       >
         <Providers>
           <AuthSync />
