@@ -37,12 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <head>
-        <link rel="icon" href="/images/imgi_3_favicon.png" type="image/png" />
-        <link
-          rel="shortcut icon"
-          href="/images/imgi_3_favicon.png"
-          type="image/png"
-        />
+        <link rel="icon" href="/images/imgi_1_favicon.png" type="image/png" />
         <link
           rel="stylesheet"
           type="text/css"
