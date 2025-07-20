@@ -1,41 +1,20 @@
-const express=require("express")
+const express = require("express");
+const router = express.Router();
 
-const router=express.Router()
+router.use(require("./install.routes"));
+router.use(require("./employee.routes"));
+router.use(require("./login.routes"));
+router.use(require("./service.routes"));
+router.use(require("./customer.routes"));
+router.use(require("./vehicle.routes"));
+router.use(require("./order.routes"));
+router.use(require("./dashboard.routes"));
 
-const installRouter=require("./install.routes")
+// Route not found (404) handler
+router.use((req, res, next) => {
+  const error = new Error("Not Found");
+  error.status = 404;
+  next(error);
+});
 
-const employeeRouter=require("./employee.routes")
-
-const loginRouter=require("./login.routes")
-
-const serviceRouter=require("./service.routes")
-
-//import customer routes
-const customerRouter=require("./customer.routes")
-
-const vehicleRouter=require("./vehicle.routes")
-
-const orderRouter=require("./order.routes")
-
-//import dashboard routes
-const dashboardRouter=require("./dashboard.routes")
-
-router.use(dashboardRouter)
-router.use(installRouter)
-
-router.use(loginRouter)
-
-router.use(employeeRouter)
-
-router.use(serviceRouter)
-
-//use customer routes
-router.use(customerRouter)
-
-router.use(vehicleRouter)
-
-router.use(orderRouter)
-
-
-
-module.exports=router
+module.exports = router;
