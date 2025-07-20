@@ -1,10 +1,13 @@
-<p align="center" style="background:#f3f4f6;padding:20px 0;border-radius:12px;">
-  <img src="https://i.ibb.co/L1N7Hh4/logo.png" alt="Abe's Garage Logo" width="200"/>
-</p>
 
 # 🚗 Abe's Garage Management System
 
 > A full-stack, production-grade vehicle repair and management system. Built with a modern Next.js/React frontend (Tailwind CSS, Redux Toolkit, Recharts), a robust Node.js/Express backend, and a PostgreSQL database. Designed for scalability, security, and a seamless user experience—showcasing best practices for enterprise-level business applications.
+
+<p align="center">
+  <a href="https://abe-garage-one.vercel.app" target="_blank">
+    <img src="https://img.shields.io/badge/Live_Demo-Click_Here-28a745?style=for-the-badge&logo=vercel" alt="Live Demo"/>
+  </a>
+</p>
 
 ---
 
