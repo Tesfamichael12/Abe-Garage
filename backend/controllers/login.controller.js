@@ -1,4 +1,3 @@
-const e = require("express");
 const loginService = require("../services/login.service");
 const jwt = require("jsonwebtoken");
 

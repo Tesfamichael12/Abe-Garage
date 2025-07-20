@@ -1,4 +1,3 @@
-const { get } = require("../routes/service.routes");
 const serviceService = require("../services/service.service");
 
 async function createService(req, res, next) {
