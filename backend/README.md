@@ -1,13 +1,12 @@
 # 🚗 Abe's Garage Backend
 
-> The robust and scalable backend for the Abe's Garage Management System. Built with Node.js, Express, and MySQL, it provides a secure and efficient API for the frontend application.
+> The robust and scalable backend for the Abe's Garage Management System. Built with Node.js, Express, and PostgreSQL, it provides a secure and efficient API for the frontend application.
 
 ---
 
 ## 🚀 Overview
 
-This backend provides a comprehensive API for managing all aspects of Abe's Garage operations, including employee management, customer records, vehicle servicing, and business analytics. It's designed to be secure, scalable, and easy to maintain.
-
+This backend provides a comprehensive API for managing all aspects of Abe's Garage operations, including employee management, customer records, vehicle servicing, and business analytics. It's designed to be secure, scalable, and easy to maintain for a production environment.
 
 ## 🏛️ System Architecture
 
@@ -20,25 +19,31 @@ The backend is built following a standard Model-View-Controller (MVC) architectu
 
 ---
 
+## 🔒 Security
+
+The backend is built with security in mind, incorporating several key features to protect against common vulnerabilities:
+
+- **Helmet:** Sets various HTTP headers to secure the app from common attacks like cross-site scripting (XSS) and clickjacking.
+- **CORS:** The Cross-Origin Resource Sharing policy is configured to only allow requests from the deployed frontend, preventing unauthorized access.
+- **Rate Limiting:** Protects against brute-force attacks by limiting the number of requests from a single IP address.
+- **Centralized Error Handling:** Ensures that all errors are handled gracefully and consistently, preventing information leaks.
+
+---
+
 ## 🗄️ Database Schema
 
-The backend uses a MySQL database with the following schema:
+The backend uses a PostgreSQL database. The complete schema, including table definitions and seed data, can be found in `backend/db/initial-schema.sql`.
 
+---
 
-![DB-schema-image](DB-schema-image.png)
-
-
-The database schema is designed to maintain referential integrity through foreign key constraints and supports the core business operations of the garage management system.
-
-
-## Endpoints
+## 📖 API Endpoints
 
 All endpoints are protected by a JWT-based authentication middleware, and most require admin privileges.
 
-| Method | Endpoint              | Description                            |
-| :----- | :-------------------- | :------------------------------------- |
-| `POST` | `/api/employee/login` | Logs in an employee and returns a JWT. |
-| `GET`  | `/install`            | Sets up the initial database schema.   |
+| Method | Endpoint     | Description                            |
+| :----- | :----------- | :------------------------------------- |
+| `POST` | `/api/login` | Logs in an employee and returns a JWT. |
+| `GET`  | `/install`   | Sets up the initial database schema.   |
 
 ### 📊 Dashboard
 
@@ -60,13 +65,14 @@ All endpoints are protected by a JWT-based authentication middleware, and most r
 
 ### 👤 Customer Management
 
-| Method | Endpoint               | Description                                  |
-| :----- | :--------------------- | :------------------------------------------- |
-| `POST` | `/api/customer`        | Creates a new customer.                      |
-| `GET`  | `/api/customer/search` | Searches for customers by keyword.           |
-| `GET`  | `/api/customers`       | Retrieves a paginated list of all customers. |
-| `GET`  | `/api/customer/:id`    | Retrieves a single customer by their ID.     |
-| `PUT`  | `/api/customer`        | Updates a customer's information.            |
+| Method   | Endpoint               | Description                                  |
+| :------- | :--------------------- | :------------------------------------------- |
+| `POST`   | `/api/customer`        | Creates a new customer.                      |
+| `GET`    | `/api/customer/search` | Searches for customers by keyword.           |
+| `GET`    | `/api/customers`       | Retrieves a paginated list of all customers. |
+| `GET`    | `/api/customer/:id`    | Retrieves a single customer by their ID.     |
+| `PUT`    | `/api/customer`        | Updates a customer's information.            |
+| `DELETE` | `/api/customer/:id`    | Deletes a customer by their ID.              |
 
 ### 🚗 Vehicle Management
 
@@ -109,17 +115,14 @@ All endpoints are protected by a JWT-based authentication middleware, and most r
     ```bash
     npm install
     ```
-3.  **Create a `.env` file** and add your MySQL database credentials:
+3.  **Create a `.env` file** and add your PostgreSQL database credentials:
     ```
-    DB_HOST=your_db_host
-    DB_USER=your_db_user
-    DB_PASSWORD=your_db_password
-    DB_DATABASE=your_db_name
+    DATABASE_URL=your_postgresql_connection_string
     JWT_SECRET=your_jwt_secret
     ```
-4.  **Set up the database** by running the initial queries located in `backend/services/sql/initial-queries.sql`.
+4.  **Set up the database** by running the initial schema located in `backend/db/initial-schema.sql`.
 5.  **Start the backend server:**
     `bash
-    npm start
-    `
-    The server will be running on `http://localhost:8000`.
+npm start
+`
+    The server will be running on `http://localhost:4000`.
