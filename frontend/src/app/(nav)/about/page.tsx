@@ -60,7 +60,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      <KpiSection />
+      {/* <KpiSection /> */}
 
       {/* Meet the Team Section */}
       <section className="py-24 bg-gray-50">
