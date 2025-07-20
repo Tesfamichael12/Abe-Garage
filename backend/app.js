@@ -5,7 +5,10 @@ const helmet = require("helmet");
 const routes = require("./routes/index");
 const rateLimit = require("express-rate-limit");
 
-const allowedOrigins = ["http://localhost:3000"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://abe-garage-one.vercel.app",
+];
 
 const corsOptions = {
   origin: (origin, callback) => {
@@ -20,7 +23,7 @@ const corsOptions = {
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100, 
+  max: 100,
   standardHeaders: true,
   legacyHeaders: false,
 });
