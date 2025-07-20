@@ -40,12 +40,15 @@
 ### Backend
 
 <p align="left">
-  <img src="https://skillicons.dev/icons?i=nodejs,express,postgresql,jwt" height="32" alt="Backend stack"/>
+  <img src="https://skillicons.dev/icons?i=nodejs,express,mysql,postgresql,jwt" height="32" alt="Backend stack"/>
 </p>
 
 - **Node.js** & **Express** (API Server)
-- **PostgreSQL** (Relational Database)
+- **MySQL** (Initial Development)
+- **PostgreSQL** (Production Database)
 - **JWT** (Authentication)
+
+> **Note:** The project was initially developed with MySQL and has since been migrated to PostgreSQL for production to leverage its advanced features and scalability.
 
 ---
 
