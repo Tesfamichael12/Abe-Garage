@@ -16,6 +16,7 @@ function ServicesPage() {
   const [serviceName, setServiceName] = useState("");
   const [serviceDescription, setServiceDescription] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
 
   const router = useRouter();
 
@@ -41,27 +42,44 @@ function ServicesPage() {
       }).unwrap();
       setServiceName("");
       setServiceDescription("");
-    } catch (error) {
+      alert("Service added successfully!");
+    } catch (error: any) {
       console.error(error);
-      setErrorMessage("Sorry, something went wrong. Please try again.");
+      if (error?.data?.message) {
+        setErrorMessage(error.data.message);
+        alert(`Error: ${error.data.message}`);
+      } else {
+        const errorMessageText =
+          "Sorry, something went wrong. Please try again.";
+        setErrorMessage(errorMessageText);
+        alert(errorMessageText);
+      }
     }
   };
 
   const onConfirmDelete = async () => {
     if (serviceId !== null) {
       try {
+        setDeleteErrorMessage("");
         await deleteService({ service_id: serviceId }).unwrap();
         setIsModalOpen(false);
         setServiceId(null);
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
-        alert("Sorry, something went wrong. Please try again.");
+        if (error.data && error.data.error) {
+          setDeleteErrorMessage(error.data.error);
+        } else {
+          setDeleteErrorMessage(
+            "Sorry, something went wrong. Please try again."
+          );
+        }
       }
     }
   };
 
   const handleDeleteClick = (id: number) => {
     setServiceId(id);
+    setDeleteErrorMessage("");
     setIsModalOpen(true);
   };
 
@@ -183,6 +201,7 @@ function ServicesPage() {
         onClose={() => setIsModalOpen(false)}
         onConfirm={onConfirmDelete}
         message="Are you sure you want to delete this service?"
+        errorMessage={deleteErrorMessage}
       />
     </div>
   );
