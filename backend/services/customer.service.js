@@ -174,6 +174,26 @@ async function searchCustomers(keyword) {
   }
 }
 
+async function deleteCustomer(id) {
+  try {
+    const checkOrdersSql =
+      "SELECT COUNT(*) as count FROM orders WHERE customer_id=$1";
+    const result = await query(checkOrdersSql, [id]);
+    if (result[0].count > 0) {
+      throw new Error("Cannot delete customer with existing orders");
+    }
+    const sql = "DELETE FROM customer_info WHERE customer_id=$1";
+    await query(sql, [id]);
+
+    const sql2 = "DELETE FROM customer_identifier WHERE customer_id=$1";
+    await query(sql2, [id]);
+    return true;
+  } catch (error) {
+    console.log("Error deleting customer", error.message);
+    throw new Error("Error deleting customer");
+  }
+}
+
 module.exports = {
   checkIfCustomerExist,
   createCustomer,
@@ -181,4 +201,5 @@ module.exports = {
   getCustomers,
   updateCustomer,
   searchCustomers,
+  deleteCustomer,
 };

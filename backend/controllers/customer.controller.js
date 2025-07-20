@@ -17,11 +17,9 @@ async function createCustomer(req, res, next) {
       }
     } catch (error) {
       console.error("Error in createCustomer controller: ", error);
-      res
-        .status(500)
-        .json({
-          message: "Failed to create customer due to an internal error.",
-        });
+      res.status(500).json({
+        message: "Failed to create customer due to an internal error.",
+      });
     }
   }
 }
@@ -112,10 +110,25 @@ async function searchCustomers(req, res, next) {
   }
 }
 
+async function deleteCustomer(req, res, next) {
+  try {
+    const customer = await customerService.deleteCustomer(req.params.id);
+    if (customer) {
+      res.status(200).json({ success: "true" });
+    } else {
+      res.status(400).json({ error: "Failed to delete customer" });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json({ error: "Something went wrong" });
+  }
+}
+
 module.exports = {
   createCustomer,
   getCustomer,
   getCustomers,
   updateCustomer,
   searchCustomers,
+  deleteCustomer,
 };
