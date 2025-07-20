@@ -4,7 +4,9 @@ import "./globals.css";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import Providers from "@/components/Providers";
+import AuthSync from "@/components/AuthSync";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
+import { Toaster } from "react-hot-toast";
 
 const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
@@ -45,9 +47,11 @@ export default function RootLayout({
         ></link>
       </head>
       <body
-        className={`${bebasNeue.variable} ${lato.variable} ${jost.variable} font-sans`}
+        className={`${bebasNeue.variable} ${jost.variable} ${lato.variable} font-sans`}
       >
         <Providers>
+          <AuthSync />
+          <Toaster />
           <Header />
           {children}
           <Footer />
