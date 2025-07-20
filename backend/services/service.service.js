@@ -78,12 +78,19 @@ async function deleteService(id) {
   }
 
   try {
+    const checkOrdersSql =
+      "SELECT COUNT(*) as count FROM order_services WHERE service_id=$1";
+    const result = await query(checkOrdersSql, [id]);
+    if (result[0].count > 0) {
+      throw new Error("Cannot delete service that is associated with an order");
+    }
+
     const sql = "DELETE FROM common_services WHERE service_id=$1";
     await query(sql, [id]);
     return { status: "true" };
   } catch (error) {
     console.log("error deleting service", error);
-    throw new Error("Failed to delete service");
+    throw new Error(error.message || "Failed to delete service");
   }
 }
 
