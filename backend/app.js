@@ -1,25 +1,42 @@
-const express=require("express")
-require("dotenv").config()
-const router=require("./routes")
-const cors=require("cors")
+const express = require("express");
+const app = express();
+const cors = require("cors");
+const helmet = require("helmet");
+const routes = require("./routes/index");
 
+const allowedOrigins = [
+  "http://localhost:3000",
+];
 
-const app=express()
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+};
 
+app.use(express.json());
+app.use(cors(corsOptions));
+app.use(helmet());
 
+app.use(routes);
 
-app.use(cors())
+app.use((err, req, res, next) => {
+  res.status(err.status || 500);
+  res.json({
+    message: err.message,
+    error: err,
+  });
+});
 
-app.use(express.json())
-app.use(require("sanitize").middleware)
+const port = process.env.PORT;
+app.listen(port, (err) => {
+  if (err) throw err;
+  console.log(`Server is running on port ${port}`);
+});
 
-
-
-app.use(router)
-const port=process.env.PORT;
-app.listen(port,(err)=>{
-    if(err) throw err
-    console.log(`Server is running on port ${port}`)
-})
-
-module.exports=app
+module.exports = app;
