@@ -53,6 +53,13 @@ function Header() {
           CONTACT US
         </Link>
       </li>
+      {session && (
+        <li>
+          <Link href="/dashboard" className="hover:text-customeRed">
+            DASHBOARD
+          </Link>
+        </li>
+      )}
     </>
   );
 

@@ -216,6 +216,13 @@ export const apiSlice = createApi({
         { type: "Customer", id: "LIST" },
       ],
     }),
+    deleteCustomer: builder.mutation<void, { customer_id: number }>({
+      query: ({ customer_id }) => ({
+        url: `/customer/${customer_id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Customer", id: "LIST" }],
+    }),
     getEmpoyees: builder.query<
       employeeResponse,
       { page: number; limit: number }
@@ -318,4 +325,5 @@ export const {
   useGetOrderTrendQuery,
   useGetRevenueQuery,
   useUpdateOrderMutation,
+  useDeleteCustomerMutation,
 } = apiSlice;
