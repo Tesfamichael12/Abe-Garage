@@ -6,9 +6,9 @@ import { addEmployeeRequest } from "@/types";
 import { useAddEmployeeMutation } from "@/features/api/apiSlice";
 import { useRouter } from "next/navigation";
 import { FiUserPlus } from "react-icons/fi";
+import toast from "react-hot-toast";
 
 function AddEmployeePage() {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [addEmployee, { isLoading }] = useAddEmployeeMutation();
   const router = useRouter();
 
@@ -21,10 +21,11 @@ function AddEmployeePage() {
   const onSubmit: SubmitHandler<addEmployeeRequest> = async (data) => {
     try {
       await addEmployee(data).unwrap();
+      toast.success("Employee added successfully!");
       router.push("/employees");
     } catch (error: any) {
       console.error("Error during adding employee:", error);
-      setErrorMessage(
+      toast.error(
         error.data?.message || "Something went wrong, please try again."
       );
     }
@@ -46,10 +47,10 @@ function AddEmployeePage() {
                 {...register("employee_first_name", {
                   required: "First name is required",
                 })}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-customeRed"
               />
               {errors.employee_first_name && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="text-customeRed text-xs mt-1">
                   {errors.employee_first_name.message}
                 </p>
               )}
@@ -62,10 +63,10 @@ function AddEmployeePage() {
                 {...register("employee_last_name", {
                   required: "Last name is required",
                 })}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-customeRed"
               />
               {errors.employee_last_name && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="text-customeRed text-xs mt-1">
                   {errors.employee_last_name.message}
                 </p>
               )}
@@ -84,10 +85,10 @@ function AddEmployeePage() {
                 },
               })}
               type="email"
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-customeRed"
             />
             {errors.employee_email && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-customeRed text-xs mt-1">
                 {errors.employee_email.message}
               </p>
             )}
@@ -100,10 +101,10 @@ function AddEmployeePage() {
               {...register("employee_phone", {
                 required: "Phone number is required",
               })}
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-customeRed"
             />
             {errors.employee_phone && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-customeRed text-xs mt-1">
                 {errors.employee_phone.message}
               </p>
             )}
@@ -114,13 +115,13 @@ function AddEmployeePage() {
             </label>
             <select
               {...register("company_role_id", { required: "Role is required" })}
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-customeRed"
             >
               <option value={1}>Employee</option>
               <option value={2}>Admin</option>
             </select>
             {errors.company_role_id && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-customeRed text-xs mt-1">
                 {errors.company_role_id.message}
               </p>
             )}
@@ -138,23 +139,19 @@ function AddEmployeePage() {
                 },
               })}
               type="password"
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-customeRed"
             />
             {errors.employee_password && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-customeRed text-xs mt-1">
                 {errors.employee_password.message}
               </p>
             )}
           </div>
-          {errorMessage && (
-            <div className="text-center text-red-500 bg-red-100 p-3 rounded-lg">
-              {errorMessage}
-            </div>
-          )}
+
           <div>
             <button
               disabled={isLoading}
-              className="w-full flex justify-center items-center px-6 py-3 rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:bg-red-300"
+              className="w-full flex justify-center items-center px-6 py-3 rounded-lg bg-customeRed text-white hover:bg-customeHover disabled:bg-red-300"
               type="submit"
             >
               {isLoading ? (

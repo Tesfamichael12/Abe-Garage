@@ -6,8 +6,9 @@ import {
   useUpdateServiceMutation,
 } from "@/features/api/apiSlice";
 import { PulseLoader } from "react-spinners";
+import toast from "react-hot-toast";
 
-function page() {
+function EditServicePage() {
   const { id } = useParams();
   const router = useRouter();
   const service_id = parseInt(id as string);
@@ -28,7 +29,7 @@ function page() {
 
   const handleEditClick = async () => {
     if (!serviceName || !serviceDescription) {
-      setErrorMessage("Please fill in all fields");
+      toast.error("Please fill in all fields");
       return;
     }
 
@@ -39,11 +40,11 @@ function page() {
         service_name: serviceName,
         service_description: serviceDescription,
       }).unwrap();
-      alert("Service updated successfully");
+      toast.success("Service updated successfully");
       router.push("/Services");
     } catch (error) {
       console.log(error);
-      setErrorMessage("sorry,something went wrong. Please try again");
+      toast.error("sorry,something went wrong. Please try again");
     }
   };
 
@@ -57,12 +58,10 @@ function page() {
 
         <input
           type="text"
-          inputMode="numeric"
           value={serviceName}
           onChange={(e) => setServiceName(e.target.value)}
-          pattern="[0-9]*"
           placeholder="Service name"
-          className="w-full p-2 my-5 border rounded-md focus:ring focus:ring-blue-300 appearance-none"
+          className="w-full p-2 my-5 border rounded-md focus:ring focus:ring-blue-300"
         />
 
         <textarea
@@ -73,7 +72,7 @@ function page() {
           rows={3}
         />
 
-        {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
+        {errorMessage && <p className="text-customeRed mt-2">{errorMessage}</p>}
 
         <button
           className=" px-10 py-4 mt-5 text-white bg-customeRed rounded-md"
@@ -87,4 +86,4 @@ function page() {
   );
 }
 
-export default page;
+export default EditServicePage;

@@ -38,7 +38,7 @@ const OrdersPage = () => {
       case 2:
         return { text: "Completed", color: "bg-green-100 text-green-800" };
       case 3:
-        return { text: "Cancelled", color: "bg-red-100 text-red-800" };
+        return { text: "Cancelled", color: "bg-red-100 text-customeRed" };
       default:
         return { text: "Unknown", color: "bg-gray-100 text-gray-800" };
     }
@@ -55,7 +55,7 @@ const OrdersPage = () => {
   if (isError) {
     console.error("Error fetching orders:", error);
     return (
-      <div className="text-center text-red-500 mt-10">
+      <div className="text-center text-customeRed mt-10">
         Error loading orders. Please try again.
       </div>
     );

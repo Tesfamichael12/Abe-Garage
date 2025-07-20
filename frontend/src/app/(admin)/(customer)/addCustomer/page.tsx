@@ -6,9 +6,9 @@ import { CustomerFormField } from "@/types";
 import { useAddCustomerMutation } from "@/features/api/apiSlice";
 import { useRouter } from "next/navigation";
 import { FiUserPlus } from "react-icons/fi";
+import toast from "react-hot-toast";
 
 function AddCustomerPage() {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
   const [addCustomer, { isLoading }] = useAddCustomerMutation();
 
@@ -21,10 +21,11 @@ function AddCustomerPage() {
   const onSubmit: SubmitHandler<CustomerFormField> = async (data) => {
     try {
       await addCustomer(data).unwrap();
+      toast.success("Customer added successfully!");
       router.push("/customers");
     } catch (error: any) {
       console.error("Error during adding customer:", error);
-      setErrorMessage(
+      toast.error(
         error.data?.message || "Something went wrong, please try again."
       );
     }
@@ -46,10 +47,10 @@ function AddCustomerPage() {
                 {...register("customer_first_name", {
                   required: "First name is required",
                 })}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-customeRed"
               />
               {errors.customer_first_name && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="text-customeRed text-xs mt-1">
                   {errors.customer_first_name.message}
                 </p>
               )}
@@ -62,10 +63,10 @@ function AddCustomerPage() {
                 {...register("customer_last_name", {
                   required: "Last name is required",
                 })}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-customeRed"
               />
               {errors.customer_last_name && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="text-customeRed text-xs mt-1">
                   {errors.customer_last_name.message}
                 </p>
               )}
@@ -84,10 +85,10 @@ function AddCustomerPage() {
                 },
               })}
               type="email"
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-customeRed"
             />
             {errors.customer_email && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-customeRed text-xs mt-1">
                 {errors.customer_email.message}
               </p>
             )}
@@ -100,25 +101,19 @@ function AddCustomerPage() {
               {...register("customer_phone_number", {
                 required: "Phone number is required",
               })}
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-customeRed"
             />
             {errors.customer_phone_number && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-customeRed text-xs mt-1">
                 {errors.customer_phone_number.message}
               </p>
             )}
           </div>
 
-          {errorMessage && (
-            <div className="text-center text-red-500 bg-red-100 p-3 rounded-lg">
-              {errorMessage}
-            </div>
-          )}
-
           <div>
             <button
               disabled={isLoading}
-              className="w-full flex justify-center items-center px-6 py-3 rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:bg-red-300"
+              className="w-full flex justify-center items-center px-6 py-3 rounded-lg bg-customeRed text-white hover:bg-customeHover disabled:bg-red-300"
               type="submit"
             >
               {isLoading ? (

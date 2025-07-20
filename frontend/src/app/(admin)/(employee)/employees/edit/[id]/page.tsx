@@ -1,26 +1,40 @@
-"use client"
+"use client";
 import { useEffect } from "react";
-import { useGetEmployeeByIdQuery, useEmployeeUpdateInfoMutation } from "@/features/api/apiSlice";
+import {
+  useGetEmployeeByIdQuery,
+  useEmployeeUpdateInfoMutation,
+} from "@/features/api/apiSlice";
 import { useParams } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { PulseLoader } from "react-spinners";
 import { EmployeeUpdateForm } from "@/types";
+import toast from "react-hot-toast";
 
 function Page() {
   const { id } = useParams();
   const employee_id = parseInt(id as string);
-  const [updateEmployeeInfo, { isLoading: isUpdating }] = useEmployeeUpdateInfoMutation();
-  const { data: employee, isLoading, error } = useGetEmployeeByIdQuery({ employee_id });
+  const [updateEmployeeInfo, { isLoading: isUpdating }] =
+    useEmployeeUpdateInfoMutation();
+  const {
+    data: employee,
+    isLoading,
+    error,
+  } = useGetEmployeeByIdQuery({ employee_id });
 
-  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<EmployeeUpdateForm>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<EmployeeUpdateForm>({
     defaultValues: {
       employee_email: "",
       employee_first_name: "",
       employee_last_name: "",
       employee_phone: "",
       active_employee: false,
-      company_role_id: 0
-    }
+      company_role_id: 0,
+    },
   });
 
   useEffect(() => {
@@ -36,10 +50,14 @@ function Page() {
 
   const onSubmit: SubmitHandler<EmployeeUpdateForm> = async (data) => {
     try {
-      await updateEmployeeInfo({ ...data, employee_id, active_employee: data.active_employee ? 1 : 0 });
-      alert("Employee Updated Successfully");
+      await updateEmployeeInfo({
+        ...data,
+        employee_id,
+        active_employee: data.active_employee,
+      }).unwrap();
+      toast.success("Employee Updated Successfully");
     } catch (error) {
-      alert("Failed to update Employee");
+      toast.error("Failed to update Employee");
     }
   };
 
@@ -52,7 +70,8 @@ function Page() {
       {employee?.data && employee.data.length > 0 ? (
         <>
           <p className="text-4xl font-bold text-customBlue">
-            Edit {employee.data[0].employee_first_name} {employee.data[0].employee_last_name}
+            Edit {employee.data[0].employee_first_name}{" "}
+            {employee.data[0].employee_last_name}
             <span className="inline-block ml-3 w-12 h-[2px] bg-customeRed"></span>
           </p>
 
@@ -64,46 +83,68 @@ function Page() {
                   required: "Employee Email is required",
                   pattern: {
                     value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                    message: "Invalid email address"
-                  }
+                    message: "Invalid email address",
+                  },
                 })}
                 className="block w-full sm:w-[50%] p-2 mb-4 border border-gray-300 rounded"
                 placeholder="Employee Email"
               />
-              {errors.employee_email && <p className="text-red-500">{errors.employee_email.message}</p>}
+              {errors.employee_email && (
+                <p className="text-customeRed">
+                  {errors.employee_email.message}
+                </p>
+              )}
             </div>
 
             <div>
               <label className="block mb-2">First Name</label>
               <input
-                {...register("employee_first_name", { required: "Employee first name is required" })}
+                {...register("employee_first_name", {
+                  required: "Employee first name is required",
+                })}
                 className="block w-full sm:w-[50%] p-2 mb-4 border border-gray-300 rounded"
                 placeholder="First Name"
                 type="text"
               />
-              {errors.employee_first_name && <p className="text-red-500">{errors.employee_first_name.message}</p>}
+              {errors.employee_first_name && (
+                <p className="text-customeRed">
+                  {errors.employee_first_name.message}
+                </p>
+              )}
             </div>
 
             <div>
               <label className="block mb-2">Last Name</label>
               <input
-                {...register("employee_last_name", { required: "Employee last name is required" })}
+                {...register("employee_last_name", {
+                  required: "Employee last name is required",
+                })}
                 className="block w-full sm:w-[50%] p-2 mb-4 border border-gray-300 rounded"
                 placeholder="Last Name"
                 type="text"
               />
-              {errors.employee_last_name && <p className="text-red-500">{errors.employee_last_name.message}</p>}
+              {errors.employee_last_name && (
+                <p className="text-customeRed">
+                  {errors.employee_last_name.message}
+                </p>
+              )}
             </div>
 
             <div>
               <label className="block mb-2">Phone</label>
               <input
-                {...register("employee_phone", { required: "Employee phone number is required" })}
+                {...register("employee_phone", {
+                  required: "Employee phone number is required",
+                })}
                 className="block w-full sm:w-[50%] p-2 mb-4 border border-gray-300 rounded"
                 placeholder="Phone"
                 type="text"
               />
-              {errors.employee_phone && <p className="text-red-500">{errors.employee_phone.message}</p>}
+              {errors.employee_phone && (
+                <p className="text-customeRed">
+                  {errors.employee_phone.message}
+                </p>
+              )}
             </div>
 
             <div>
@@ -115,21 +156,31 @@ function Page() {
                 />
                 Active Employee
               </label>
-              {errors.active_employee && <p className="text-red-500">{errors.active_employee.message}</p>}
+              {errors.active_employee && (
+                <p className="text-customeRed">
+                  {errors.active_employee.message}
+                </p>
+              )}
             </div>
 
             <div>
               <label className="block mb-4">
                 <span className="text-gray-700">Employee Role</span>
                 <select
-                  {...register("company_role_id", { required: "Employee role is required" })}
+                  {...register("company_role_id", {
+                    required: "Employee role is required",
+                  })}
                   className="block w-full sm:w-[50%] p-2 mb-4 border border-gray-300 rounded"
                 >
                   <option value={1}>Employee</option>
                   <option value={2}>Admin</option>
                 </select>
               </label>
-              {errors.company_role_id && <p className="text-red-500">{errors.company_role_id.message}</p>}
+              {errors.company_role_id && (
+                <p className="text-customeRed">
+                  {errors.company_role_id.message}
+                </p>
+              )}
             </div>
 
             <button
@@ -140,7 +191,11 @@ function Page() {
               {isUpdating ? <PulseLoader size={8} color="#fff" /> : "UPDATE"}
             </button>
 
-            {error && <p className="text-red-500">Something went wrong, please try again later.</p>}
+            {error && (
+              <p className="text-customeRed">
+                Something went wrong, please try again later.
+              </p>
+            )}
           </form>
         </>
       ) : (

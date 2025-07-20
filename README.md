@@ -1,10 +1,13 @@
-<p align="center" style="background:#f3f4f6;padding:20px 0;border-radius:12px;">
-  <img src="https://i.ibb.co/L1N7Hh4/logo.png" alt="Abe's Garage Logo" width="200"/>
-</p>
 
 # 🚗 Abe's Garage Management System
 
-> A full-stack, production-grade vehicle repair and management system. Built with a modern Next.js/React frontend (Tailwind CSS, Redux Toolkit, Recharts), a robust Node.js/Express backend, and a MySQL database. Designed for scalability, security, and a seamless user experience—showcasing best practices for enterprise-level business applications.
+> A full-stack, production-grade vehicle repair and management system. Built with a modern Next.js/React frontend (Tailwind CSS, Redux Toolkit, Recharts), a robust Node.js/Express backend, and a PostgreSQL database. Designed for scalability, security, and a seamless user experience—showcasing best practices for enterprise-level business applications.
+
+<p align="center">
+  <a href="https://abe-garage-one.vercel.app" target="_blank">
+    <img src="https://img.shields.io/badge/Live_Demo-Click_Here-28a745?style=for-the-badge&logo=vercel" alt="Live Demo"/>
+  </a>
+</p>
 
 ---
 
@@ -40,12 +43,35 @@
 ### Backend
 
 <p align="left">
-  <img src="https://skillicons.dev/icons?i=nodejs,express,mysql,jwt" height="32" alt="Backend stack"/>
+  <img src="https://skillicons.dev/icons?i=nodejs,express,mysql,postgresql,jwt" height="32" alt="Backend stack"/>
 </p>
 
 - **Node.js** & **Express** (API Server)
-- **MySQL** (Relational Database)
+- **MySQL** (Initial Development)
+- **PostgreSQL** (Production Database)
 - **JWT** (Authentication)
+
+> **Note:** The project was initially developed with MySQL and has since been migrated to PostgreSQL for production to leverage its advanced features and scalability.
+
+---
+
+## 🔒 Security
+
+The backend is built with security in mind, incorporating several key features to protect against common vulnerabilities:
+
+- **Helmet:** Sets various HTTP headers to secure the app from common attacks like cross-site scripting (XSS) and clickjacking.
+- **CORS:** The Cross-Origin Resource Sharing policy is configured to only allow requests from the deployed frontend, preventing unauthorized access.
+- **Rate Limiting:** Protects against brute-force attacks by limiting the number of requests from a single IP address.
+- **Centralized Error Handling:** Ensures that all errors are handled gracefully and consistently, preventing information leaks.
+
+---
+
+## 🚀 Deployment
+
+This application is built for production and can be deployed to any modern cloud platform.
+
+- **Frontend:** The Next.js frontend is optimized for Vercel, providing a seamless deployment experience.
+- **Backend:** The Node.js/Express backend is configured for deployment on Render, with a production-ready PostgreSQL database.
 
 ---
 
@@ -68,15 +94,12 @@ cd Abe-Garage
   ```bash
   npm install
   ```
-- Create a `.env` file and add your MySQL database credentials:
+- Create a `.env` file and add your PostgreSQL database credentials:
   ```
-  DB_HOST=your_db_host
-  DB_USER=your_db_user
-  DB_PASSWORD=your_db_password
-  DB_DATABASE=your_db_name
+  DATABASE_URL=your_postgresql_connection_string
   JWT_SECRET=your_jwt_secret
   ```
-- Set up the database by running the initial queries located in `backend/services/sql/initial-queries.sql`.
+- Set up the database by running the initial schema located in `backend/db/initial-schema.sql`.
 - Start the backend server:
   ```bash
   npm start
@@ -90,17 +113,17 @@ cd Abe-Garage
   ```
 - Install dependencies:
   ```bash
-  npm install
+   npm install
   ```
 - Create a `.env.local` file and add the API URL:
   ```
-  NEXT_PUBLIC_API_URL=http://localhost:8000
+  NEXT_PUBLIC_API_URL=http://localhost:4000
   NEXTAUTH_SECRET=your_nextauth_secret
   NEXTAUTH_URL=http://localhost:3000
   ```
 - Start the frontend development server:
   ```bash
-  npm run dev
+   npm run dev
   ```
 
 ---
@@ -108,4 +131,3 @@ cd Abe-Garage
 ## 🙌 Credits
 
 - Built by [Tesfamichael Tafere](https://github.com/Tesfamichael12)
-
