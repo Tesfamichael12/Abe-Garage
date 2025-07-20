@@ -5,6 +5,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { PulseLoader } from "react-spinners";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 type FormFields = {
   email: string;
@@ -13,6 +14,7 @@ type FormFields = {
 
 function SignInPage() {
   const [error, setError] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -76,7 +78,7 @@ function SignInPage() {
                 <p className="text-red-500 mt-1">{errors.email.message}</p>
               )}
             </div>
-            <div>
+            <div className="relative">
               <input
                 {...register("password", {
                   required: "Password is required",
@@ -85,14 +87,22 @@ function SignInPage() {
                     message: "Password must be at least 8 characters",
                   },
                 })}
-                className="w-full p-4 bg-gray-50 border-2 border-gray-200 focus:outline-none focus:border-customeRed focus:ring-0"
+                className="w-full p-4 bg-gray-50 border-2 border-gray-200 focus:outline-none focus:border-customeRed focus:ring-0 pr-12"
                 placeholder="Password"
-                type="password"
+                type={showPassword ? "text" : "password"}
               />
-              {errors.password && (
-                <p className="text-red-500 mt-1">{errors.password.message}</p>
-              )}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
             </div>
+            {errors.password && (
+              <p className="text-red-500 mt-1">{errors.password.message}</p>
+            )}
+
             {error && (
               <p className="text-red-500 text-center">
                 Invalid credentials. Please try again.
