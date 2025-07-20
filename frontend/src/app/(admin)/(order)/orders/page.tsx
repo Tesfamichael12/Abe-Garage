@@ -5,7 +5,7 @@ import {
   useUpdateOrderMutation,
 } from "@/features/api/apiSlice";
 import { Order, updateOrderRequest } from "@/types";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiChevronDown } from "react-icons/fi";
 import { PuffLoader } from "react-spinners";
 
 const OrdersPage = () => {
@@ -116,23 +116,26 @@ const OrdersPage = () => {
                       </td>
                       <td className="px-6 py-4">{order.employee_name}</td>
                       <td className="px-6 py-4">
-                        <select
-                          value={order.order_status}
-                          onChange={(e) =>
-                            handleStatusChange(
-                              order.order_id,
-                              parseInt(e.target.value)
-                            )
-                          }
-                          disabled={isUpdating}
-                          className={`w-full text-center px-3 py-1 rounded-md text-xs font-semibold border-none outline-none appearance-none ${statusInfo.color}`}
-                          style={{ minWidth: "120px" }}
-                        >
-                          <option value={0}>Pending</option>
-                          <option value={1}>In Progress</option>
-                          <option value={2}>Completed</option>
-                          <option value={3}>Cancelled</option>
-                        </select>
+                        <div className="relative cursor-pointer">
+                          <select
+                            value={order.order_status}
+                            onChange={(e) =>
+                              handleStatusChange(
+                                order.order_id,
+                                parseInt(e.target.value)
+                              )
+                            }
+                            disabled={isUpdating}
+                            className={`w-full text-center px-3 py-1 rounded-md text-xs font-semibold border-none outline-none appearance-none ${statusInfo.color} cursor-pointer`}
+                            style={{ minWidth: "120px" }}
+                          >
+                            <option value={0}>Pending</option>
+                            <option value={1}>In Progress</option>
+                            <option value={2}>Completed</option>
+                            <option value={3}>Cancelled</option>
+                          </select>
+                          <FiChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                        </div>
                       </td>
                     </tr>
                   );
