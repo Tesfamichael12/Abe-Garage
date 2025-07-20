@@ -2,7 +2,7 @@ const { query } = require("../config/db.config");
 
 const getKPIs = async () => {
   try {
-    const sql = `SELECT 
+    const sql = `SELECT
     (SELECT COUNT(*) FROM customer_identifier) AS total_customers,
     (SELECT COUNT(*) FROM orders WHERE active_order = 1) AS active_orders,
     (SELECT SUM(order_total_price) FROM order_info) AS total_revenue;
@@ -18,10 +18,10 @@ const getKPIs = async () => {
 
 const getOrderTrends = async () => {
   try {
-    const sql = `SELECT 
-    DATE_FORMAT(order_date, '%Y-%m') AS month, 
-    COUNT(*) AS orders 
-FROM orders 
+    const sql = `SELECT
+    TO_CHAR(order_date, 'YYYY-MM') AS month,
+    COUNT(*) AS orders
+FROM orders
 GROUP BY month
 ORDER BY month;
 `;
@@ -36,11 +36,11 @@ ORDER BY month;
 
 const getRevenueBreakdown = async () => {
   try {
-    const sql = `SELECT 
-    DATE_FORMAT(order_date, '%Y-%m') AS month, 
-    SUM(order_total_price) AS revenue 
-FROM orders 
-JOIN order_info ON orders.order_id = order_info.order_id 
+    const sql = `SELECT
+    TO_CHAR(order_date, 'YYYY-MM') AS month,
+    SUM(order_total_price) AS revenue
+FROM orders
+JOIN order_info ON orders.order_id = order_info.order_id
 GROUP BY month
 ORDER BY month;
 `;

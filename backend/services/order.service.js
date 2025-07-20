@@ -1,12 +1,8 @@
-const { query, getConnection } = require("../config/db.config");
-
+const { query } = require("../config/db.config");
 const crypto = require("crypto");
 const Jwt_secret = process.env.JWT_SECRET;
 
 async function createOrder(order) {
-  const connection = await getConnection();
-
-  // Generate a unique hash using employee_id, customer_id, vehicle_id, and current timestamp
   const uniqueString = `${order.employee_id}-${order.customer_id}-${
     order.vehicle_id
   }-${Date.now()}`;
@@ -16,77 +12,42 @@ async function createOrder(order) {
     .digest("hex");
 
   try {
-    await connection.beginTransaction();
-
     const sql1 =
-      "INSERT INTO orders (employee_id, customer_id,vehicle_id, active_order,order_hash) VALUES (?,?,?,?,?)";
-    const [result1] = await connection.query(sql1, [
+      "INSERT INTO orders (employee_id, customer_id,vehicle_id, active_order,order_hash) VALUES ($1,$2,$3,$4,$5) RETURNING order_id";
+    const result1 = await query(sql1, [
       order.employee_id,
       order.customer_id,
       order.vehicle_id,
       1,
       order_hash,
     ]);
-    if (result1.affectedRows !== 1) {
-      throw new Error("Failed to insert into orders");
-    }
-    const order_id = result1.insertId;
+    const order_id = result1[0].order_id;
+
     const sql2 =
-      "INSERT INTO order_info (order_id,order_total_price,additional_request,additional_requests_completed) VALUES (?,?,?,?)";
-
-    if (order?.additional_request) {
-      const [result2] = await connection.query(sql2, [
-        order_id,
-        order.order_total_price,
-        order.additional_request,
-        0,
-      ]);
-      if (result2.affectedRows !== 1) {
-        throw new Error("Failed to insert into order_info");
-      }
-    } else {
-      const [result2] = await connection.query(sql2, [
-        order_id,
-        order.order_total_price,
-        null,
-        null,
-      ]);
-      if (result2.affectedRows !== 1) {
-        throw new Error("Failed to insert into order_info");
-      }
-    }
-
-    const sql3 =
-      "INSERT INTO order_services (order_id,service_id,service_completed) VALUES (?,?,?)";
+      "INSERT INTO order_info (order_id,order_total_price,additional_request,additional_requests_completed) VALUES ($1,$2,$3,$4)";
+    await query(sql2, [
+      order_id,
+      order.order_total_price,
+      order.additional_request || null,
+      order.additional_request ? 0 : null,
+    ]);
 
     if (order?.order_services) {
+      const sql3 =
+        "INSERT INTO order_services (order_id,service_id,service_completed) VALUES ($1,$2,$3)";
       for (let i = 0; i < order.order_services.length; i++) {
-        const [result3] = await connection.query(sql3, [
-          order_id,
-          order.order_services[i].service_id,
-          0,
-        ]);
-        if (result3.affectedRows !== 1) {
-          throw new Error("Failed to insert into order_services");
-        }
+        await query(sql3, [order_id, order.order_services[i].service_id, 0]);
       }
     }
-    const sql4 =
-      "INSERT INTO order_status (order_id,order_status) VALUES (?,?)";
-    const [result4] = await connection.query(sql4, [order_id, 0]);
-    if (result4.affectedRows !== 1) {
-      throw new Error("Failed to insert into order_status");
-    }
 
-    await connection.commit();
+    const sql4 =
+      "INSERT INTO order_status (order_id,order_status) VALUES ($1,$2)";
+    await query(sql4, [order_id, 0]);
 
     return true;
   } catch (error) {
-    connection.rollback();
     console.error("Error creating order in service:", error);
-    return false;
-  } finally {
-    connection.release();
+    throw new Error("Error creating order");
   }
 }
 
@@ -126,14 +87,11 @@ FROM
         employee e ON o.employee_id = e.employee_id
       LEFT JOIN 
         employee_info ei ON e.employee_id = ei.employee_id
-      LIMIT ? OFFSET ?;
+      LIMIT $1 OFFSET $2;
     `;
 
     const orders = await query(sql, [limit, offset]);
-
-    if (orders.length > 0) {
-      return orders;
-    }
+    return orders;
   } catch (error) {
     console.log("Error getting orders", error.message);
     throw new Error("Error getting orders");
@@ -162,13 +120,12 @@ async function getOrderByHash(hash) {
         LEFT JOIN 
             order_status os ON o.order_id = os.order_id
         WHERE 
-            o.order_hash = ?;
+            o.order_hash = $1;
     `;
 
     const [order] = await query(sql, [hash]);
-    //check if order performed is not successful
 
-    if (order && order.length < 1) {
+    if (!order) {
       return false;
     }
 
@@ -183,13 +140,11 @@ async function getOrderByHash(hash) {
     LEFT JOIN 
         common_services cs ON os.service_id = cs.service_id
     WHERE 
-        os.order_id = ?;
+        os.order_id = $1;
 `;
 
     const services = await query(sql2, [order.order_id]);
-
     order.order_services = services;
-
     return order;
   } catch (error) {
     console.log("Error getting order by hash", error.message);
@@ -198,117 +153,81 @@ async function getOrderByHash(hash) {
 }
 
 async function updateOrder(order) {
-  const connection = await getConnection();
   try {
-    await connection.beginTransaction();
-
-    const sql1 = "UPDATE orders SET active_order = ? WHERE order_id = ?";
-    const [result1] = await connection.query(sql1, [
-      order.active_order,
-      order.order_id,
-    ]);
-    if (result1.affectedRows !== 1) {
-      throw new Error("Failed to update orders");
-    }
+    const sql1 = "UPDATE orders SET active_order = $1 WHERE order_id = $2";
+    await query(sql1, [order.active_order, order.order_id]);
 
     const sql2 =
-      "UPDATE order_info SET order_total_price = ?, additional_request = ?, additional_requests_completed = ? WHERE order_id = ?";
-    const [result2] = await connection.query(sql2, [
+      "UPDATE order_info SET order_total_price = $1, additional_request = $2, additional_requests_completed = $3 WHERE order_id = $4";
+    await query(sql2, [
       order.order_total_price,
       order.additional_request,
       order.additional_requests_completed,
       order.order_id,
     ]);
-    if (result2.affectedRows !== 1) {
-      throw new Error("Failed to update order_info");
-    }
 
-    const sql3 = "UPDATE order_status SET order_status = ? WHERE order_id = ?";
-    const [result3] = await connection.query(sql3, [
-      order.order_status,
-      order.order_id,
-    ]);
-    if (result3.affectedRows !== 1) {
-      throw new Error("Failed to update order_status");
-    }
+    const sql3 =
+      "UPDATE order_status SET order_status = $1 WHERE order_id = $2";
+    await query(sql3, [order.order_status, order.order_id]);
 
-    const sql4 = "DELETE FROM order_services WHERE order_id = ?";
-    const [result4] = await connection.query(sql4, [order.order_id]);
-    if (result4.affectedRows < 1) {
-      throw new Error("Failed to delete from order_services");
-    }
+    const sql4 = "DELETE FROM order_services WHERE order_id = $1";
+    await query(sql4, [order.order_id]);
 
     const sql5 =
-      "INSERT INTO order_services (order_id,service_id,service_completed) VALUES (?,?,?)";
-
+      "INSERT INTO order_services (order_id,service_id,service_completed) VALUES ($1,$2,$3)";
     for (let i = 0; i < order.order_services.length; i++) {
-      const [result5] = await connection.query(sql5, [
+      await query(sql5, [
         order.order_id,
         order.order_services[i].service_id,
         order.order_services[i].service_completed,
       ]);
-      if (result5.affectedRows !== 1) {
-        throw new Error("Failed to insert into order_services");
-      }
     }
-
-    await connection.commit();
 
     return true;
   } catch (error) {
-    connection.rollback();
-    console.log("Error updating order", error.message);
-    return false;
-  } finally {
-    connection.release();
+    console.error("Error updating order in service:", error);
+    throw new Error("Error updating order");
   }
 }
 
 async function getCustomerOrders(id) {
   try {
     const sql = `
-       SELECT 
-            o.order_id,
-            o.employee_id,
-            o.customer_id,
-            o.vehicle_id,
-            o.order_date,
-            o.active_order,
-            o.order_hash,
-            oi.order_total_price,
-            os.order_status,
-            ci.customer_email,
-            CONCAT(cinfo.customer_first_name, ' ', cinfo.customer_last_name) AS customer_name,
-            v.vehicle_model,
-            v.vehicle_tag,
-            CONCAT(ei.employee_first_name, ' ', ei.employee_last_name) AS employee_name
-        FROM 
-            orders o
-        LEFT JOIN 
-            order_info oi ON o.order_id = oi.order_id
-        LEFT JOIN 
-            order_status os ON o.order_id = os.order_id
-        LEFT JOIN 
-            customer_identifier ci ON o.customer_id = ci.customer_id
-        LEFT JOIN 
-            customer_info cinfo ON o.customer_id = cinfo.customer_id
-             LEFT JOIN 
-            customer_vehicle_info v ON o.vehicle_id = v.vehicle_id
-        LEFT JOIN 
-            employee e ON o.employee_id = e.employee_id
-        LEFT JOIN 
-            employee_info ei ON e.employee_id = ei.employee_id
-        WHERE 
-            o.customer_id = ?;
+      SELECT 
+        o.order_id,
+        o.employee_id,
+        CONCAT(ei.employee_first_name, ' ', ei.employee_last_name) AS employee_name,
+        o.customer_id,
+        o.vehicle_id,
+        o.order_date,
+        o.active_order,
+        o.order_hash,
+        oi.order_total_price,
+        os.order_status,
+        ci.customer_email,
+        CONCAT(cinfo.customer_first_name, ' ', cinfo.customer_last_name) AS customer_name,
+        v.vehicle_model,
+        v.vehicle_tag
+FROM
+        orders o
+      LEFT JOIN 
+        order_info oi ON o.order_id = oi.order_id
+      LEFT JOIN 
+        order_status os ON o.order_id = os.order_id
+      LEFT JOIN 
+        customer_identifier ci ON o.customer_id = ci.customer_id
+      LEFT JOIN 
+        customer_info cinfo ON o.customer_id = cinfo.customer_id
+      LEFT JOIN 
+        customer_vehicle_info v ON o.vehicle_id = v.vehicle_id
+      LEFT JOIN 
+        employee e ON o.employee_id = e.employee_id
+      LEFT JOIN 
+        employee_info ei ON e.employee_id = ei.employee_id
+      WHERE o.customer_id = $1;
     `;
-
     const orders = await query(sql, [id]);
-
-    if (orders.length > 0) {
-      return orders;
-    } else {
-      return [];
-    }
+    return orders;
   } catch (error) {
     console.log("Error getting customer orders", error.message);
     throw new Error("Error getting customer orders");
@@ -317,11 +236,11 @@ async function getCustomerOrders(id) {
 
 async function updateOrderStatus(order_id, order_status) {
   try {
-    const sql = "UPDATE order_status SET order_status = ? WHERE order_id = ?";
-    const result = await query(sql, [order_status, order_id]);
-    return result.affectedRows === 1;
+    const sql = "UPDATE order_status SET order_status = $1 WHERE order_id = $2";
+    await query(sql, [order_status, order_id]);
+    return true;
   } catch (error) {
-    console.error("Error updating order status in service:", error);
+    console.log("Error updating order status", error.message);
     throw new Error("Error updating order status");
   }
 }

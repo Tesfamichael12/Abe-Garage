@@ -1,76 +1,55 @@
-const {query,getConnection}=require("../config/db.config")
-const crypto=require('crypto')
+const { query } = require("../config/db.config");
+const crypto = require("crypto");
 
 const Jwt_secret = process.env.JWT_SECRET; //use this secret to hash the email
 
+async function checkIfCustomerExist(email) {
+  const sql = "SELECT * FROM customer_identifier WHERE customer_email=$1";
+  const result = await query(sql, [email]);
 
-async function checkIfCustomerExist(email){
-    const sql="SELECT * FROM customer_identifier WHERE customer_email=?"
-    const result=await query(sql,[email])
-
-    return result.length>0
+  return result.length > 0;
 }
 
-async function createCustomer(customer){
+async function createCustomer(customer) {
+  const {
+    customer_first_name,
+    customer_last_name,
+    customer_email,
+    customer_phone_number,
+  } = customer;
+  const newHash = crypto
+    .createHash("sha256")
+    .update(customer_email + Jwt_secret)
+    .digest("hex");
 
-    const {customer_first_name,customer_last_name,customer_email,customer_phone_number}=customer
+  try {
+    const sql1 =
+      "INSERT INTO customer_identifier (customer_email,customer_phone_number,customer_hash) VALUES ($1,$2,$3) RETURNING customer_id";
+    const result1 = await query(sql1, [
+      customer_email,
+      customer_phone_number,
+      newHash,
+    ]);
+    const customer_id = result1[0].customer_id;
 
-    //get connection from pool
-    const connection=await getConnection()
+    const sql2 =
+      "INSERT INTO customer_info (customer_id,customer_first_name,customer_last_name,active_customer_status) VALUES ($1,$2,$3,$4)";
+    await query(sql2, [
+      customer_id,
+      customer_first_name,
+      customer_last_name,
+      1,
+    ]);
 
-    try {
-        //start transaction
-        await connection.beginTransaction()
-
-        //generate hash for the email
-        const newHash=crypto.createHash('sha256').update(customer_email + Jwt_secret ).digest('hex')
-
-
-        const sql1="INSERT INTO customer_identifier (customer_email,customer_phone_number,customer_hash) VALUES (?,?,?)"
-
-        //insert into customer_info
-        const [rows1]=await connection.query(sql1,[customer_email,customer_phone_number,newHash])
-
-        //check if the insert was successful
-        if(rows1.affectedRows!==1){
-            throw new Error("Failed to insert into customer_identifier")
-        }
-        
-        const customer_id=rows1.insertId
-
-        //insert into customer_info
-        const sql2="INSERT INTO customer_info (customer_id,customer_first_name,customer_last_name,active_customer_status) VALUES (?,?,?,?)"
-
-        const [rows2]= await connection.query(sql2,[customer_id,customer_first_name,customer_last_name,1])
-
-        //check if the insert was successful
-        if(rows2.affectedRows!==1){
-            throw new Error("Failed to insert into customer_info")
-        }
-
-        //commit the transaction
-        await connection.commit()
-
-        return true
-
-        
-    } catch (error) {
-        //rollback the transaction
-        await connection.rollback()
-        console.log("Error creating customer",error.message)
-        throw new Error("Error creating customer")
-        
-    } finally{
-        //release the connection
-        connection.release()
-    }
-    
-
+    return true;
+  } catch (error) {
+    console.log("Error creating customer", error.message);
+    throw new Error("Error creating customer");
+  }
 }
 
-async function getCustomer(customer_id){
-    
-    const sql=`SELECT 
+async function getCustomer(customer_id) {
+  const sql = `SELECT 
      ci.customer_id,
     ci.customer_email,
     ci.customer_phone_number,
@@ -81,26 +60,24 @@ async function getCustomer(customer_id){
     ci_info.active_customer_status
     FROM customer_identifier ci
     JOIN customer_info ci_info ON ci.customer_id=ci_info.customer_id
-    WHERE ci.customer_id=?`
+    WHERE ci.customer_id=$1`;
 
-    try {
-        
-        const rows=await query(sql,[customer_id])
+  try {
+    const rows = await query(sql, [customer_id]);
 
-        if(rows && rows.length>0){
-            return rows[0]}
-            else{
-                return null
-            }
-    } catch (error) {
-        console.log("Error getting customer",error.message)
-        throw new Error("Error getting customer")
-        
+    if (rows && rows.length > 0) {
+      return rows[0];
+    } else {
+      return null;
     }
+  } catch (error) {
+    console.log("Error getting customer", error.message);
+    throw new Error("Error getting customer");
+  }
 }
 
-async function getCustomers(page,limit){
-    const sql=`SELECT 
+async function getCustomers(page, limit) {
+  const sql = `SELECT 
     ci.customer_id,
     ci.customer_email,
     ci.customer_phone_number,
@@ -111,67 +88,65 @@ async function getCustomers(page,limit){
     ci_info.active_customer_status
     FROM customer_identifier ci
     JOIN customer_info ci_info ON ci.customer_id=ci_info.customer_id
-    LIMIT ?,?`
-    const sql2=`SELECT COUNT(*) as total FROM customer_identifier`
+    LIMIT $1 OFFSET $2`;
+  const sql2 = `SELECT COUNT(*) as total FROM customer_identifier`;
 
-    const offset=(page-1)*limit
+  const offset = (page - 1) * limit;
 
-    try {
-        const [{total}]=await query(sql2)
-        const rows=await query(sql,[offset,limit])
+  try {
+    const totalResult = await query(sql2);
+    const total = totalResult[0].total;
+    const rows = await query(sql, [limit, offset]);
 
-
-        return {total,data:rows}
-        
-    } catch (error) {
-        console.log("Error getting customers",error.message)
-        throw new Error("Error getting customers")
-        
-    }
+    return { total, data: rows };
+  } catch (error) {
+    console.log("Error getting customers", error.message);
+    throw new Error("Error getting customers");
+  }
 }
 
-async function updateCustomer(customer){
-    const {customer_id,customer_first_name,customer_last_name,customer_email,customer_phone_number,active_customer_status}=customer
+async function updateCustomer(customer) {
+  const {
+    customer_id,
+    customer_first_name,
+    customer_last_name,
+    customer_email,
+    customer_phone_number,
+    active_customer_status,
+  } = customer;
+  const newHash = crypto
+    .createHash("sha256")
+    .update(customer_email + Jwt_secret)
+    .digest("hex");
 
-    const connection=await getConnection()
+  try {
+    const sql1 =
+      "UPDATE customer_identifier SET customer_email=$1,customer_hash=$2,customer_phone_number=$3 WHERE customer_id=$4 ";
+    await query(sql1, [
+      customer_email,
+      newHash,
+      customer_phone_number,
+      customer_id,
+    ]);
 
-    try {
-        await connection.beginTransaction()
+    const sql2 =
+      "UPDATE customer_info SET customer_first_name=$1,customer_last_name=$2,active_customer_status=$3 WHERE customer_id=$4 ";
+    await query(sql2, [
+      customer_first_name,
+      customer_last_name,
+      active_customer_status,
+      customer_id,
+    ]);
 
-        const newHash=crypto.createHash('sha256').update(customer_email + Jwt_secret ).digest('hex')
-
-        const sql1="UPDATE customer_identifier SET customer_email=?,customer_hash=?,customer_phone_number=? WHERE customer_id=? "
-
-        const [rows1]=await connection.query(sql1,[customer_email,newHash,customer_phone_number,customer_id])
-
-        if(rows1.affectedRows!==1){
-            throw new Error("Failed to update customer_identifier")
-        }
-
-        const sql2="UPDATE customer_info SET customer_first_name=?,customer_last_name=?,active_customer_status=? WHERE customer_id=? "
-
-        const [rows2]=await connection.query(sql2,[customer_first_name,customer_last_name,active_customer_status,customer_id])
-
-        if(rows2.affectedRows!==1){
-            throw new Error("Failed to update customer_info")
-        }
-
-        await connection.commit()
-
-        return true
-        
-    } catch (error) {
-        await connection.rollback()
-        console.log("Error updating customer",error.message)
-        throw new Error("Error updating customer")
-        
-    } finally{
-        connection.release()
-    }
+    return true;
+  } catch (error) {
+    console.log("Error updating customer", error.message);
+    throw new Error("Error updating customer");
+  }
 }
 async function searchCustomers(keyword) {
-    console.log("keyword",keyword)
-    const sql = `SELECT 
+  console.log("keyword", keyword);
+  const sql = `SELECT 
       ci.customer_id,
       ci.customer_email,
       ci.customer_phone_number,
@@ -182,20 +157,28 @@ async function searchCustomers(keyword) {
       ci_info.active_customer_status
       FROM customer_identifier ci
       JOIN customer_info ci_info ON ci.customer_id = ci_info.customer_id
-      WHERE ci_info.customer_first_name LIKE ? OR ci_info.customer_last_name LIKE ? OR ci.customer_email LIKE ?`;
-  
-    const searchKeyword = `%${keyword}%`;
-  
-    try {
-      const rows = await query(sql, [searchKeyword, searchKeyword, searchKeyword]);
-      return rows;
-    } catch (error) {
-      console.log("Error searching customers", error.message);
-      throw new Error("Error searching customers");
-    }
-  }
+      WHERE ci_info.customer_first_name LIKE $1 OR ci_info.customer_last_name LIKE $2 OR ci.customer_email LIKE $3`;
 
-module.exports={
-    checkIfCustomerExist,
-    createCustomer,getCustomer,getCustomers,updateCustomer,searchCustomers
+  const searchKeyword = `%${keyword}%`;
+
+  try {
+    const rows = await query(sql, [
+      searchKeyword,
+      searchKeyword,
+      searchKeyword,
+    ]);
+    return rows;
+  } catch (error) {
+    console.log("Error searching customers", error.message);
+    throw new Error("Error searching customers");
+  }
 }
+
+module.exports = {
+  checkIfCustomerExist,
+  createCustomer,
+  getCustomer,
+  getCustomers,
+  updateCustomer,
+  searchCustomers,
+};
