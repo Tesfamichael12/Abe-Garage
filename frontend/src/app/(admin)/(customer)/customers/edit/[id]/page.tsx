@@ -8,8 +8,9 @@ import {
 import { useForm, SubmitHandler } from "react-hook-form";
 import { customerUpdateForm } from "@/types";
 import { PulseLoader } from "react-spinners";
+import toast from "react-hot-toast";
 
-function page() {
+function EditCustomerPage() {
   const { id } = useParams();
   const router = useRouter();
   const customer_id = parseInt(id as string);
@@ -38,7 +39,6 @@ function page() {
   });
 
   useEffect(() => {
-    console.log(customer?.data?.customer);
     if (customer?.data && customer.data.customer) {
       setValue("customer_email", customer.data.customer.customer_email);
       setValue(
@@ -62,12 +62,12 @@ function page() {
       await updateCustomerInfo({
         ...data,
         customer_id,
-        active_customer_status: data.active_customer_status ? 1 : 0,
-      });
-      alert("Customer updated successfully");
+        active_customer_status: data.active_customer_status,
+      }).unwrap();
+      toast.success("Customer updated successfully");
       router.push("/customers");
     } catch (error) {
-      alert("Failed to update customer");
+      toast.error("Failed to update customer");
     }
   };
 
@@ -96,7 +96,7 @@ function page() {
               placeholder=""
             />
             {errors.customer_email && (
-              <p className="text-red-500">{errors.customer_email.message}</p>
+              <p className="text-customeRed">{errors.customer_email.message}</p>
             )}
             <input
               {...register("customer_first_name", {
@@ -107,7 +107,7 @@ function page() {
               type="text"
             />
             {errors.customer_first_name && (
-              <p className="text-red-500">
+              <p className="text-customeRed">
                 {errors.customer_first_name.message}
               </p>
             )}
@@ -120,7 +120,7 @@ function page() {
               type="text"
             />
             {errors.customer_last_name && (
-              <p className="text-red-500">
+              <p className="text-customeRed">
                 {errors.customer_last_name.message}
               </p>
             )}
@@ -133,7 +133,7 @@ function page() {
               type="text"
             />
             {errors.customer_phone_number && (
-              <p className="text-red-500">
+              <p className="text-customeRed">
                 {errors.customer_phone_number.message}
               </p>
             )}
@@ -146,7 +146,7 @@ function page() {
               Active Customer
             </label>
             {errors.active_customer_status && (
-              <p className="text-red-500">
+              <p className="text-customeRed">
                 {errors.active_customer_status.message}
               </p>
             )}
@@ -157,7 +157,7 @@ function page() {
             >
               {isUpdating ? <PulseLoader size={8} color="#fff" /> : "UPDATE"}
             </button>
-            {error && <p className="text-red-500">Invalid Credential</p>}
+            {error && <p className="text-customeRed">Invalid Credential</p>}
           </form>
         </>
       ) : (
@@ -171,4 +171,4 @@ function page() {
   );
 }
 
-export default page;
+export default EditCustomerPage;

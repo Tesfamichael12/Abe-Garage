@@ -124,7 +124,7 @@ function NewOrderPage() {
               <HiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
               <input
                 type="text"
-                className="w-full border border-gray-300 p-4 pl-12 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                className="w-full border border-gray-300 p-4 pl-12 rounded-lg focus:ring-2 focus:ring-customeRed focus:border-customeRed"
                 placeholder="Search by name, email, or phone..."
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
@@ -134,7 +134,7 @@ function NewOrderPage() {
               <div className="text-center p-4">Searching...</div>
             )}
             {(customerError || defaultCustomerError) && (
-              <p className="mt-4 text-red-500">Error fetching customers.</p>
+              <p className="mt-4 text-customeRed">Error fetching customers.</p>
             )}
             <div className="space-y-2">
               {customers.map((customer) => (
@@ -143,7 +143,7 @@ function NewOrderPage() {
                   onClick={() => setSelectedCustomer(customer)}
                   className={`cursor-pointer p-4 rounded-lg border ${
                     selectedCustomer?.customer_id === customer.customer_id
-                      ? "bg-red-500 text-white"
+                      ? "bg-customeRed text-white"
                       : "bg-white hover:bg-gray-50"
                   }`}
                 >
@@ -161,7 +161,7 @@ function NewOrderPage() {
               <div className="text-center p-4">Loading vehicles...</div>
             )}
             {vehicleError && (
-              <p className="mt-4 text-red-500">Error fetching vehicles.</p>
+              <p className="mt-4 text-customeRed">Error fetching vehicles.</p>
             )}
             {vehicles.map((vehicle) => (
               <div
@@ -169,7 +169,7 @@ function NewOrderPage() {
                 onClick={() => setSelectedVehicle(vehicle)}
                 className={`cursor-pointer p-4 rounded-lg border ${
                   selectedVehicle?.vehicle_id === vehicle.vehicle_id
-                    ? "bg-red-500 text-white"
+                    ? "bg-customeRed text-white"
                     : "bg-white hover:bg-gray-50"
                 }`}
               >
@@ -208,7 +208,7 @@ function NewOrderPage() {
                 <textarea
                   id="additionalRequest"
                   rows={4}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-customeRed"
                   value={additionalRequest}
                   onChange={(e) => setAdditionalRequest(e.target.value)}
                 />
@@ -223,7 +223,7 @@ function NewOrderPage() {
                 <input
                   id="price"
                   type="number"
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-customeRed"
                   value={price}
                   onChange={(e) =>
                     setPrice(
@@ -259,7 +259,9 @@ function NewOrderPage() {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Total Price</p>
-                <p className="font-semibold text-2xl text-red-600">${price}</p>
+                <p className="font-semibold text-2xl text-customeRed">
+                  ${price}
+                </p>
               </div>
               {additionalRequest && (
                 <div>
@@ -291,11 +293,11 @@ function NewOrderPage() {
             >
               <div className="flex items-center">
                 <span
-                  className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                  className={`flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full ${
                     currentStep > step.id
-                      ? "bg-red-600 text-white"
+                      ? "bg-green-500 text-white"
                       : currentStep === step.id
-                      ? "bg-red-500 text-white"
+                      ? "bg-customeRed text-white"
                       : "bg-gray-200 text-gray-500"
                   }`}
                 >
@@ -312,7 +314,9 @@ function NewOrderPage() {
               {index < steps.length - 1 && (
                 <div
                   className={`flex-auto border-t-2 mx-4 ${
-                    currentStep > step.id ? "border-red-600" : "border-gray-200"
+                    currentStep > step.id
+                      ? "border-green-500"
+                      : "border-gray-200"
                   }`}
                 ></div>
               )}
@@ -326,7 +330,7 @@ function NewOrderPage() {
       </div>
 
       {errorMessage && (
-        <div className="mt-4 text-center text-red-500 bg-red-100 p-3 rounded-lg">
+        <div className="mt-4 text-center text-customeRed bg-red-100 p-3 rounded-lg">
           {errorMessage}
         </div>
       )}
@@ -343,7 +347,7 @@ function NewOrderPage() {
         {currentStep < 4 ? (
           <button
             onClick={handleNextStep}
-            className="flex items-center px-6 py-3 rounded-lg bg-red-500 text-white hover:bg-red-600"
+            className="flex items-center px-6 py-3 rounded-lg bg-customeRed text-white hover:bg-customeHover"
           >
             Next
             <HiArrowRight className="ml-2" />

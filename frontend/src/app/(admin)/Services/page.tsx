@@ -9,6 +9,7 @@ import {
 } from "@/features/api/apiSlice";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 function ServicesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,7 +17,6 @@ function ServicesPage() {
   const [serviceName, setServiceName] = useState("");
   const [serviceDescription, setServiceDescription] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
 
   const router = useRouter();
 
@@ -30,7 +30,7 @@ function ServicesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!serviceName || !serviceDescription) {
-      setErrorMessage("Please fill in all fields.");
+      toast.error("Please fill in all fields.");
       return;
     }
 
@@ -42,17 +42,15 @@ function ServicesPage() {
       }).unwrap();
       setServiceName("");
       setServiceDescription("");
-      alert("Service added successfully!");
+      toast.success("Service added successfully!");
     } catch (error: any) {
       console.error(error);
       if (error?.data?.message) {
-        setErrorMessage(error.data.message);
-        alert(`Error: ${error.data.message}`);
+        toast.error(`Error: ${error.data.message}`);
       } else {
         const errorMessageText =
           "Sorry, something went wrong. Please try again.";
-        setErrorMessage(errorMessageText);
-        alert(errorMessageText);
+        toast.error(errorMessageText);
       }
     }
   };
@@ -60,18 +58,16 @@ function ServicesPage() {
   const onConfirmDelete = async () => {
     if (serviceId !== null) {
       try {
-        setDeleteErrorMessage("");
         await deleteService({ service_id: serviceId }).unwrap();
         setIsModalOpen(false);
         setServiceId(null);
+        toast.success("Service deleted successfully!");
       } catch (error: any) {
         console.error(error);
         if (error.data && error.data.error) {
-          setDeleteErrorMessage(error.data.error);
+          toast.error(error.data.error);
         } else {
-          setDeleteErrorMessage(
-            "Sorry, something went wrong. Please try again."
-          );
+          toast.error("Sorry, something went wrong. Please try again.");
         }
       }
     }
@@ -79,7 +75,6 @@ function ServicesPage() {
 
   const handleDeleteClick = (id: number) => {
     setServiceId(id);
-    setDeleteErrorMessage("");
     setIsModalOpen(true);
   };
 
@@ -125,7 +120,7 @@ function ServicesPage() {
                       </button>
                       <button
                         onClick={() => handleDeleteClick(service.service_id)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-customeRed hover:text-customeHover"
                       >
                         <FiTrash2 size={18} />
                       </button>
@@ -156,7 +151,7 @@ function ServicesPage() {
                   value={serviceName}
                   onChange={(e) => setServiceName(e.target.value)}
                   placeholder="e.g., Oil Change"
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-customeRed"
                 />
               </div>
               <div>
@@ -171,16 +166,16 @@ function ServicesPage() {
                   value={serviceDescription}
                   onChange={(e) => setServiceDescription(e.target.value)}
                   placeholder="Describe the service..."
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500"
+                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-customeRed"
                   rows={4}
                 />
               </div>
               {errorMessage && (
-                <p className="text-red-500 text-sm">{errorMessage}</p>
+                <p className="text-customeRed text-sm">{errorMessage}</p>
               )}
               <button
                 type="submit"
-                className="w-full flex justify-center items-center px-6 py-3 rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:bg-red-300"
+                className="w-full flex justify-center items-center px-6 py-3 rounded-lg bg-customeRed text-white hover:bg-customeHover disabled:bg-red-300"
                 disabled={isCreating}
               >
                 {isCreating ? (
@@ -201,7 +196,6 @@ function ServicesPage() {
         onClose={() => setIsModalOpen(false)}
         onConfirm={onConfirmDelete}
         message="Are you sure you want to delete this service?"
-        errorMessage={deleteErrorMessage}
       />
     </div>
   );

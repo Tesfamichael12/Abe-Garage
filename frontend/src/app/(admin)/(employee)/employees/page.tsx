@@ -15,6 +15,7 @@ import {
 import ConfirmationModal from "@/components/ConfirmationModal";
 import { PuffLoader } from "react-spinners";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 function EmployeesPage() {
   const router = useRouter();
@@ -39,9 +40,14 @@ function EmployeesPage() {
 
   const handleConfirmDelete = async () => {
     if (selectedEmployee !== null) {
-      await deleteEmployee({ employee_id: selectedEmployee });
-      setIsModalOpen(false);
-      setSelectedEmployee(null);
+      try {
+        await deleteEmployee({ employee_id: selectedEmployee }).unwrap();
+        setIsModalOpen(false);
+        setSelectedEmployee(null);
+        toast.success("Employee deleted successfully!");
+      } catch (error) {
+        toast.error("Failed to delete employee. Please try again.");
+      }
     }
   };
 
@@ -55,7 +61,7 @@ function EmployeesPage() {
   if (isError) {
     console.log("Error fetching employees:", error);
     return (
-      <div className="text-center text-red-500 mt-10">
+      <div className="text-center text-customeRed mt-10">
         Error loading employees. Please try again.
       </div>
     );
@@ -68,7 +74,7 @@ function EmployeesPage() {
           Manage Employees
         </h1>
         <Link href="/addEmployee">
-          <button className="flex items-center px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600">
+          <button className="flex items-center px-4 py-2 rounded-lg bg-customeRed text-white hover:bg-customeHover">
             <FiUserPlus className="mr-2" />
             Add Employee
           </button>
@@ -129,7 +135,7 @@ function EmployeesPage() {
                         className={`px-2 py-1 rounded-full text-xs font-semibold ${
                           employee.active_employee
                             ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
+                            : "bg-red-100 text-customeRed"
                         }`}
                       >
                         {employee.active_employee ? "Active" : "Inactive"}
@@ -151,7 +157,7 @@ function EmployeesPage() {
                           onClick={() =>
                             handleDeleteClick(employee.employee_id)
                           }
-                          className="text-red-600 hover:text-red-900"
+                          className="text-customeRed hover:text-customeHover"
                         >
                           <FiTrash2 size={18} />
                         </button>

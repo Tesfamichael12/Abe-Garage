@@ -9,28 +9,29 @@ import {
   ResponsiveContainer,
   CartesianGrid,
   Legend,
+  AreaChart,
+  Area,
 } from "recharts";
 
 function OrderTrends() {
   const { data: orderTrends, isLoading, error } = useGetOrderTrendQuery();
 
-  if (isLoading)
-    return <div className="text-center p-4">Loading order trends...</div>;
   if (error)
     return (
       <div className="text-center p-4 text-red-500">
         Error loading order trends.
       </div>
     );
+  if (isLoading) return null;
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="bg-white p-6 rounded-2xl shadow-sm transition-all hover:shadow-lg">
       <h3 className="text-xl font-semibold text-gray-800 mb-4 font-jost">
         Monthly Order Trends
       </h3>
       <div style={{ width: "100%", height: 300 }}>
         <ResponsiveContainer>
-          <LineChart data={orderTrends || []}>
+          <AreaChart data={orderTrends || []}>
             <defs>
               <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
@@ -47,16 +48,16 @@ function OrderTrends() {
                 borderRadius: "0.5rem",
               }}
             />
-            <Legend />
-            <Line
+
+            <Area
               type="monotone"
               dataKey="orders"
               stroke="#3b82f6"
-              strokeWidth={2}
+              strokeWidth={3}
               fillOpacity={1}
               fill="url(#colorOrders)"
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
     </div>
