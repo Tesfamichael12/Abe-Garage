@@ -4,8 +4,9 @@ import {
   useGetcustomersByKeywordQuery,
   useGetVehiclesByCustomerIdQuery,
   useCreateOrderMutation,
+  useGetCustomersQuery,
 } from "@/features/api/apiSlice";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Customer, vehicle, CreateOrderRequest } from "@/types";
 import { skipToken } from "@reduxjs/toolkit/query/react";
@@ -44,6 +45,12 @@ function NewOrderPage() {
     error: customerError,
   } = useGetcustomersByKeywordQuery(keyword ? { keyword } : skipToken);
 
+  const {
+    data: defaultCustomersResult,
+    isLoading: isDefaultCustomerLoading,
+    error: defaultCustomerError,
+  } = useGetCustomersQuery(keyword ? skipToken : { page: 1, limit: 10 });
+
   const customerId = selectedCustomer?.customer_id;
   const {
     data: vehiclesResult,
@@ -54,8 +61,11 @@ function NewOrderPage() {
   );
 
   const customers = useMemo(
-    () => customersResult?.customers || [],
-    [customersResult]
+    () =>
+      keyword
+        ? customersResult?.customers || []
+        : defaultCustomersResult?.customers || [],
+    [customersResult, defaultCustomersResult, keyword]
   );
   const vehicles = useMemo(() => vehiclesResult?.data || [], [vehiclesResult]);
 
@@ -120,10 +130,10 @@ function NewOrderPage() {
                 onChange={(e) => setKeyword(e.target.value)}
               />
             </div>
-            {isCustomerLoading && (
+            {(isCustomerLoading || isDefaultCustomerLoading) && (
               <div className="text-center p-4">Searching...</div>
             )}
-            {customerError && (
+            {(customerError || defaultCustomerError) && (
               <p className="mt-4 text-red-500">Error fetching customers.</p>
             )}
             <div className="space-y-2">

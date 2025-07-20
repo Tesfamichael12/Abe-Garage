@@ -1,136 +1,111 @@
-# Garage Web App
+<p align="center" style="background:#f3f4f6;padding:20px 0;border-radius:12px;">
+  <img src="https://i.ibb.co/L1N7Hh4/logo.png" alt="Abe's Garage Logo" width="200"/>
+</p>
 
-This repository contains the code for the Garage Web App, a comprehensive software solution designed to streamline and enhance the workflow of Abe's Garage. The application manages employee registration, customer management, and order tracking, with secure and private pages accessible only to authenticated employees.
+# 🚗 Abe's Garage Management System
 
-## Table of Contents
-- [Project Overview](#project-overview)
-- [Functional Scope](#functional-scope)
-- [Technology Stack](#technology-stack)
-- [Setup and Installation](#setup-and-installation)
-- [Usage](#usage)
-- [File Structure](#file-structure)
-- [API Endpoints](#api-endpoints)
-- [Navigation Structure](#navigation-structure)
+> A full-stack, production-grade vehicle repair and management system. Built with a modern Next.js/React frontend (Tailwind CSS, Redux Toolkit, Recharts), a robust Node.js/Express backend, and a MySQL database. Designed for scalability, security, and a seamless user experience—showcasing best practices for enterprise-level business applications.
 
-## Project Overview
-The Garage Web App is developed to handle the business logic and data management for Abe's Garage. It includes features for employee authentication, customer management, and order handling, supporting the seamless daily operations of the garage.
+---
 
-## Functional Scope
-The app supports the following functionalities:
+## ✨ Features
 
-- **Employee Registration and Authentication:** Secure registration and login for garage employees.
-- **Customer Management:** CRUD operations to manage customer information.
-- **Order Management:** CRUD operations to handle customer orders.
-- **Private API Access:** APIs secured with authentication middleware, accessible only to authorized users.
+- 🔐 **Secure Authentication:** Role-based access control with JWT for employees and admins.
+- 📊 **Modern Admin Dashboard:** At-a-glance KPIs for total customers, active orders, and revenue, with visually rich charts for order trends and revenue breakdown.
+- 🧑‍💼 **Employee Management:** Full CRUD operations for adding, viewing, and deleting employees.
+- 👤 **Customer Management:** Full CRUD operations for adding, viewing, searching, and updating customer information.
+- 📝 **Order Management:** A multi-step order creation process, from customer and vehicle selection to service and pricing details. View, update, and track order statuses (Pending, In-Progress, Completed, Cancelled).
+- 🛠️ **Service Management:** Full CRUD operations for managing the services offered by the garage.
+- 📱 **Responsive Design:** A clean, modern, and mobile-first UI that works on all devices.
+- ⚡ **Optimized for Performance:** Built with Next.js for fast page loads and a smooth user experience.
 
-## Technology Stack
+---
+
+## 🖥️ Tech Stack
 
 ### Frontend
-- **React:** A JavaScript library for building user interfaces.
-- **Next.js:** A React framework for server-side rendering and static site generation.
-- **Tailwind CSS:** A utility-first CSS framework for styling.
-- **Redux Toolkit:** A state management library for managing global state.
-- **RTK Query:** A data fetching and caching tool built on top of Redux Toolkit.
-- **NextAuth.js:** An authentication library for Next.js applications.
+
+<p align="left">
+  <img src="https://skillicons.dev/icons?i=nextjs,react,ts,tailwind,redux" height="32" alt="Frontend stack"/>
+  <img src="https://img.shields.io/badge/Recharts-8884d8?style=for-the-badge&logo=recharts&logoColor=white" alt="Recharts"/>
+</p>
+
+- **Next.js** (React Framework)
+- **TypeScript**
+- **Tailwind CSS**
+- **Redux Toolkit** & **RTK Query** (State Management & Data Fetching)
+- **Recharts** (Charting Library)
+- **NextAuth.js** (Authentication)
 
 ### Backend
-- **Node.js:** A JavaScript runtime for building server-side applications.
-- **Express.js:** A web application framework for Node.js.
-- **MySQL:** A relational database management system.
-- **JWT (JSON Web Tokens):** A standard for securely transmitting information between parties as a JSON object.
-- **Git (hosted on GitHub):** For version control and collaboration.
 
-## Setup and Installation
+<p align="left">
+  <img src="https://skillicons.dev/icons?i=nodejs,express,mysql,jwt" height="32" alt="Backend stack"/>
+</p>
 
-To run the app locally:
+- **Node.js** & **Express** (API Server)
+- **MySQL** (Relational Database)
+- **JWT** (Authentication)
 
-1. **Clone the repository:**
-   ```sh
-   git clone https://github.com/yourusername/garage-web-app.git
-   ```
-2. **Navigate to the project directory:**
-   ```sh
-   cd garage-web-app
-   ```
-3. **Install dependencies:**
-   ```sh
-   npm install
-   ```
-4. **Configure the MySQL database:**
-   - Update the database settings in the `.env` file (e.g., `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`).
-5. **Run the application:**
-   ```sh
-   npm run dev
-   ```
-6. The server should now be running on [http://localhost:3000](http://localhost:3000).
+---
 
-## Usage
+## 🛠️ Local Development & Setup
 
-### Customer Search
-- Navigate to the "Create a new order" page.
-- Use the search input to find customers by first name, last name, or email.
-- Select a customer from the search results to view their details and associated vehicles.
+### 1. Clone the repo
 
-### Vehicle Selection
-- After selecting a customer, choose a vehicle from the list of associated vehicles.
-- The vehicle details will be displayed, and you can proceed to select services.
+```bash
+git clone https://github.com/Tesfamichael12/Abe-Garage.git
+cd Abe-Garage
+```
 
-### Service Selection
-- Use the `ServiceSelection` component to select services for the order.
-- The selected services will be displayed and can be managed as needed.
+### 2. Backend Setup
 
-## File Structure
+- Navigate to the backend directory:
+  ```bash
+  cd backend
+  ```
+- Install dependencies:
+  ```bash
+  npm install
+  ```
+- Create a `.env` file and add your MySQL database credentials:
+  ```
+  DB_HOST=your_db_host
+  DB_USER=your_db_user
+  DB_PASSWORD=your_db_password
+  DB_DATABASE=your_db_name
+  JWT_SECRET=your_jwt_secret
+  ```
+- Set up the database by running the initial queries located in `backend/services/sql/initial-queries.sql`.
+- Start the backend server:
+  ```bash
+  npm start
+  ```
 
-### Frontend
-- **Components:** Reusable UI components.
-- **Pages:** Next.js pages.
-- **Styles:** Tailwind CSS configuration.
+### 3. Frontend Setup
 
-### Backend
-- **Controllers:** Handle HTTP requests and responses.
-- **Services:** Business logic and database interactions.
-- **Routes:** Define API endpoints.
+- In a new terminal, navigate to the frontend directory:
+  ```bash
+  cd frontend
+  ```
+- Install dependencies:
+  ```bash
+  npm install
+  ```
+- Create a `.env.local` file and add the API URL:
+  ```
+  NEXT_PUBLIC_API_URL=http://localhost:8000
+  NEXTAUTH_SECRET=your_nextauth_secret
+  NEXTAUTH_URL=http://localhost:3000
+  ```
+- Start the frontend development server:
+  ```bash
+  npm run dev
+  ```
 
-## API Endpoints
+---
 
-### Customers
-- `GET /api/customer/search` - Search customers by keyword.
-- `GET /api/customer/:id` - Get customer details by ID.
-- `POST /api/customer` - Create a new customer.
-- `PUT /api/customer` - Update customer information.
+## 🙌 Credits
 
-### Vehicles
-- `GET /api/vehicle/customer/:customer_id` - Get vehicles by customer ID.
+- Built by [Tesfamichael Tafere](https://github.com/Tesfamichael12)
 
-### Services
-- `GET /api/services` - Get all services.
-- `POST /api/service` - Create a new service.
-
-## Navigation Structure
-
-### Public Pages
-- Home page (`/`)
-- About us page (`/about`)
-- Services page (`/services`)
-- Contact us page (`/contact`)
-- Admin page (visible only if logged in, links to the dashboard `/dashboard`)
-- Login (`/login`)
-- Order details (`/order/{orderHash}`) - Not included in the menu
-
-### Admin Pages (Login Required)
-- Admin dashboard (`/admin`)
-- Employees (`/admin/employees`)
-- Add employee (`/admin/add-employee`)
-- Edit employee (`/admin/employee/edit/:id`)
-- Customers (`/admin/customers`)
-- Add customer (`/admin/add-customer`)
-- Edit customer (`/admin/customer/edit/:id`)
-- Customer details (`/admin/customer/{customerId}`)
-- Add vehicle (`/admin/customer/{customerId}`) - Conditionally displayed on the customer details page
-- Orders (`/admin/orders`)
-- Add order (`/admin/order`)
-- Edit order (`/admin/order/{orderHash}/edit`)
-- Services (`/admin/services`)
-- Add service (`/admin/add-service`)
-
-By following these steps, you can set up and run the Garage Web App application, manage customers, vehicles, and services, and navigate through the various pages and features provided by the application.
