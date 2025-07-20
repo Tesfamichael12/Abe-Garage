@@ -118,9 +118,8 @@ function SignInPage() {
                   admin@gmail.com
                 </span>{" "}
                 and password{" "}
-                <span className="font-semibold text-gray-600">password123</span>
-                {" "} to view the admin pages
-                .
+                <span className="font-semibold text-gray-600">password123</span>{" "}
+                to view the admin pages .
               </p>
             </div>
             <div className="text-center">
@@ -136,9 +135,18 @@ function SignInPage() {
 
         {/* Right Panel: Image */}
         <div
-          className="hidden lg:block lg:w-1/2 bg-cover bg-center"
-          style={{ backgroundImage: "url('/images/vban1.jpg')" }}
-        ></div>
+          className="hidden lg:block lg:w-1/2 bg-cover bg-center relative"
+          style={{ backgroundImage: "url('/images/banner1.jpg')" }}
+        >
+          <div className="absolute inset-0 bg-black opacity-50"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <img
+              src="/images/logo.png"
+              alt="Abe's Garage Logo"
+              className="w-1/2"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
