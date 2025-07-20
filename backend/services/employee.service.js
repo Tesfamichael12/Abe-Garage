@@ -14,7 +14,7 @@ async function createEmployee(employee) {
 
     const query1 =
       "INSERT INTO employee(employee_email, active_employee) VALUES($1,$2) RETURNING employee_id";
-    const result1 = await query(query1, [employee.employee_email, 1]);
+    const result1 = await query(query1, [employee.employee_email, true]);
     const employeeId = result1[0].employee_id;
 
     const query2 =

@@ -18,7 +18,7 @@ async function createOrder(order) {
       order.employee_id,
       order.customer_id,
       order.vehicle_id,
-      1,
+      true,
       order_hash,
     ]);
     const order_id = result1[0].order_id;
@@ -29,14 +29,18 @@ async function createOrder(order) {
       order_id,
       order.order_total_price,
       order.additional_request || null,
-      order.additional_request ? 0 : null,
+      !!order.additional_request,
     ]);
 
     if (order?.order_services) {
       const sql3 =
         "INSERT INTO order_services (order_id,service_id,service_completed) VALUES ($1,$2,$3)";
       for (let i = 0; i < order.order_services.length; i++) {
-        await query(sql3, [order_id, order.order_services[i].service_id, 0]);
+        await query(sql3, [
+          order_id,
+          order.order_services[i].service_id,
+          false,
+        ]);
       }
     }
 

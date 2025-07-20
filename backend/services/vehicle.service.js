@@ -114,7 +114,7 @@ async function updateVehicle(vehicle) {
 
 async function getVehicleByCustomerId(customer_id) {
   const sql =
-    "SELECT * FROM customer_vehicle_info WHERE customer_id=$1 AND active_vehicle=1";
+    "SELECT * FROM customer_vehicle_info WHERE customer_id=$1 AND active_vehicle=true";
   const rows = await query(sql, [customer_id]);
   return rows;
 }

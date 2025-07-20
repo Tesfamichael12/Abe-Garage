@@ -4,7 +4,7 @@ const getKPIs = async () => {
   try {
     const sql = `SELECT
     (SELECT COUNT(*) FROM customer_identifier) AS total_customers,
-    (SELECT COUNT(*) FROM orders WHERE active_order = 1) AS active_orders,
+    (SELECT COUNT(*) FROM orders WHERE active_order = true) AS active_orders,
     (SELECT SUM(order_total_price) FROM order_info) AS total_revenue;
 `;
     const [kpis] = await query(sql);
