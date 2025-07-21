@@ -20,8 +20,11 @@ function ServicesPage() {
 
   const router = useRouter();
 
-  const { data: servicesData, isLoading: isLoadingServices } =
-    useGetServicesQuery();
+  const {
+    data: servicesData,
+    isLoading: isLoadingServices,
+    isError,
+  } = useGetServicesQuery();
   const [createService, { isLoading: isCreating }] = useCreateServiceMutation();
   const [deleteService] = useDeleteServiceMutation();
 
@@ -44,7 +47,6 @@ function ServicesPage() {
       setServiceDescription("");
       toast.success("Service added successfully!");
     } catch (error: any) {
-      console.error(error);
       if (error?.data?.message) {
         toast.error(`Error: ${error.data.message}`);
       } else {
@@ -62,13 +64,8 @@ function ServicesPage() {
         setIsModalOpen(false);
         setServiceId(null);
         toast.success("Service deleted successfully!");
-      } catch (error: any) {
-        console.error(error);
-        if (error.data && error.data.error) {
-          toast.error(error.data.error);
-        } else {
-          toast.error("Sorry, something went wrong. Please try again.");
-        }
+      } catch (error) {
+        toast.error("Failed to delete service. Please try again.");
       }
     }
   };
@@ -77,6 +74,29 @@ function ServicesPage() {
     setServiceId(id);
     setIsModalOpen(true);
   };
+
+  const handleEdit = (id: number) => {
+    router.push(`Services/edit/${id}`);
+  };
+
+  if (isLoadingServices) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <PulseLoader size={15} color={"#EF4444"} />
+      </div>
+    );
+  }
+
+  if (isError) {
+    toast.error("Failed to load services. Please try again later.");
+    return (
+      <div className="text-center mt-10">
+        <p className="text-red-500 text-lg">
+          Failed to load services. Please try again later.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -90,45 +110,37 @@ function ServicesPage() {
             <h2 className="text-xl font-semibold text-gray-700 font-jost mb-4">
               Available Services
             </h2>
-            {isLoadingServices ? (
-              <div className="text-center">
-                <PulseLoader color="#4A90E2" />
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {services.map((service) => (
-                  <div
-                    key={service.service_id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:shadow-lg transition-shadow"
-                  >
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        {service.service_name}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {service.service_description}
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <button
-                        onClick={() =>
-                          router.push(`Services/edit/${service.service_id}`)
-                        }
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        <FiEdit size={18} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(service.service_id)}
-                        className="text-customeRed hover:text-customeHover"
-                      >
-                        <FiTrash2 size={18} />
-                      </button>
-                    </div>
+            <div className="space-y-4">
+              {services.map((service) => (
+                <div
+                  key={service.service_id}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:shadow-lg transition-shadow"
+                >
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      {service.service_name}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      {service.service_description}
+                    </p>
                   </div>
-                ))}
-              </div>
-            )}
+                  <div className="flex items-center space-x-4">
+                    <button
+                      onClick={() => handleEdit(service.service_id)}
+                      className="text-blue-600 hover:text-blue-900"
+                    >
+                      <FiEdit size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(service.service_id)}
+                      className="text-customeRed hover:text-customeHover"
+                    >
+                      <FiTrash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

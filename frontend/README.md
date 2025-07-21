@@ -28,6 +28,12 @@ This directory contains the frontend of the Abe's Garage Management System, buil
 - **NextAuth.js** (Authentication)
 - **React Hot Toast** (Toast Notifications)
 
+## ✨ SEO & Performance
+
+- 🔍 **Search Engine Optimized (SEO):** Enhanced with dynamic meta tags, a `sitemap.xml` for better search engine indexing, and a `robots.txt` file to guide web crawlers.
+- 🚀 **Google Search Console:** Indexed with Google Search Console to monitor search performance and visibility.
+- ⚡ **Optimized for Performance:** Built with Next.js for fast page loads and a smooth user experience.
+
 ## 🚀 Deployment
 
 The frontend is optimized for deployment on Vercel, providing a seamless and automated deployment experience.

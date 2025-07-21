@@ -1,11 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { PulseLoader } from "react-spinners";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 type FormFields = {
   email: string;
@@ -18,6 +19,13 @@ function SignInPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) {
+      toast.error(error);
+    }
+  }, [searchParams]);
+
   const {
     register,
     handleSubmit,
@@ -26,6 +34,27 @@ function SignInPage() {
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     const { email, password } = data;
+    const toastId = toast.loading(
+      "Connecting to the server... Render server might be spinning up from inactivity, which could take up to 50 seconds, only for the initial request. Thank you for your patience.",
+      {
+        duration: 80000,
+        style: {
+          background: "rgba(255, 255, 255, 0.6)",
+          backdropFilter: "blur(15px)",
+          color: "#000000",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+          borderRadius: "12px",
+          borderLeft: "4px solid #FFD700",
+          padding: "12px 16px",
+          boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+          fontSize: "16px",
+          fontWeight: "600",
+          width: "400px",
+          maxWidth: "90vw",
+        },
+        className: "hover:pause",
+      }
+    );
 
     try {
       const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -37,20 +66,24 @@ function SignInPage() {
         callbackUrl,
       });
 
+      toast.dismiss(toastId);
+
       if (response?.error) {
         setError(true);
-        console.error("Error during sign-in:", response.error);
+        toast.error("Invalid credentials. Please try again.");
       } else {
+        toast.success("Signed in successfully!");
         router.push(response?.url || "/dashboard");
       }
     } catch (error) {
-      console.error("Error during sign-in:", error);
+      toast.dismiss(toastId);
+      toast.error("An unexpected error occurred. Please try again later.");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="flex w-full max-w-4xl shadow-2xl">
+      <div className="flex w-full max-w-6xl shadow-2xl">
         {/* Left Panel: Form */}
         <div className="w-full lg:w-1/2 bg-white p-8 sm:p-12">
           <div className="mb-8 text-center">

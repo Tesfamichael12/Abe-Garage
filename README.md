@@ -1,4 +1,3 @@
-
 # 🚗 Abe's Garage Management System
 
 > A full-stack, production-grade vehicle repair and management system. Built with a modern Next.js/React frontend (Tailwind CSS, Redux Toolkit, Recharts), a robust Node.js/Express backend, and a PostgreSQL database. Designed for scalability, security, and a seamless user experience—showcasing best practices for enterprise-level business applications.
@@ -11,6 +10,27 @@
 
 ---
 
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td valign="top" width="50%">
+      <h3 align="center">Landing Page</h3>
+      <img src="images/image-0.png" alt="Main Dashboard" width="100%"/>
+    </td>
+    <td valign="top" width="50%">
+      <h3 align="center">Admin Pages</h3>
+      <img src="images/image-1.png" alt="Employee Management" width="100%"/>
+      <img src="images/image-2.png" alt="Customer Management" width="100%"/>
+      <img src="images/image-3.png" alt="Order Creation" width="100%"/>
+      <img src="images/image-4.png" alt="Service Management" width="100%"/>
+      <img src="images/image-5.png" alt="Order Details" width="100%"/>
+      <img src="images/image-6.png" alt="Login Page" width="100%"/>
+      <img src="images/image-7.png" alt="Mobile View" width="100%"/>
+    </td>
+  </tr>
+</table>
+
 ## ✨ Features
 
 - 🔐 **Secure Authentication:** Role-based access control with JWT for employees and admins.
@@ -21,6 +41,7 @@
 - 🛠️ **Service Management:** Full CRUD operations for managing the services offered by the garage.
 - 📱 **Responsive Design:** A clean, modern, and mobile-first UI that works on all devices.
 - ⚡ **Optimized for Performance:** Built with Next.js for fast page loads and a smooth user experience.
+- 🔍 **Search Engine Optimized (SEO):** Enhanced with dynamic meta tags, a `sitemap.xml` for better search engine indexing, and a `robots.txt` file to guide web crawlers. Indexed with Google Search Console to monitor search performance.
 
 ---
 
@@ -55,6 +76,21 @@
 
 ---
 
+## 🚀 Deployment
+
+<p align="left">
+  <img src="https://skillicons.dev/icons?i=vercel,supabase" height="32" alt="Deployment platforms"/>
+  <img src="https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Render"/>
+</p>
+
+This application is deployed across a modern, scalable infrastructure:
+
+- **Frontend:** Hosted on **Vercel**, providing a seamless, high-performance experience with Next.js.
+- **Backend:** The Node.js API is deployed on **Render**, ensuring a reliable and scalable server environment.
+- **Database:** The PostgreSQL database is managed by **Supabase**, offering a robust and secure data layer.
+
+---
+
 ## 🔒 Security
 
 The backend is built with security in mind, incorporating several key features to protect against common vulnerabilities:
@@ -63,15 +99,6 @@ The backend is built with security in mind, incorporating several key features t
 - **CORS:** The Cross-Origin Resource Sharing policy is configured to only allow requests from the deployed frontend, preventing unauthorized access.
 - **Rate Limiting:** Protects against brute-force attacks by limiting the number of requests from a single IP address.
 - **Centralized Error Handling:** Ensures that all errors are handled gracefully and consistently, preventing information leaks.
-
----
-
-## 🚀 Deployment
-
-This application is built for production and can be deployed to any modern cloud platform.
-
-- **Frontend:** The Next.js frontend is optimized for Vercel, providing a seamless deployment experience.
-- **Backend:** The Node.js/Express backend is configured for deployment on Render, with a production-ready PostgreSQL database.
 
 ---
 
@@ -131,3 +158,4 @@ cd Abe-Garage
 ## 🙌 Credits
 
 - Built by [Tesfamichael Tafere](https://github.com/Tesfamichael12)
+- <a href="https://github.com/Tesfamichael12/Abe-Garage"><strong>Source Code</strong> <img src="https://skillicons.dev/icons?i=github" height="20" alt="GitHub"/></a>

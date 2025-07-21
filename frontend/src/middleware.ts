@@ -17,18 +17,22 @@ export async function middleware(req: NextRequest) {
   const session = await auth();
 
   if (!session) {
-    console.log("Unauthorized access, redirecting to login...");
     const signInUrl = new URL("/signin", req.url);
     signInUrl.searchParams.set("callbackUrl", req.url);
+    signInUrl.searchParams.set(
+      "error",
+      "You must be logged in to view that page."
+    );
     return NextResponse.redirect(signInUrl);
   }
 
-  console.log("Authorized access, proceeding...");
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/addCustomer/:path*"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|images|signin|about|contact|services).*)",
+  ],
 };
 
 // "employee_email": "update@gmail.com",
