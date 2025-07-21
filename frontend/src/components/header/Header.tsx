@@ -7,11 +7,13 @@ import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import Button from "../ui/Button";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 function Header() {
   const { data: session } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const router = useRouter();
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
@@ -33,8 +35,9 @@ function Header() {
   }, []);
 
   const handleSignOut = async () => {
-    await signOut({ callbackUrl: "/signin" });
+    await signOut({ redirect: false });
     toast.success("Signed out successfully!");
+    router.push("/signin");
   };
 
   const navLinks = (
