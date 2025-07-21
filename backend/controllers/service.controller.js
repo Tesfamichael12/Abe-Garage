@@ -1,5 +1,4 @@
 const serviceService = require("../services/service.service");
-const serviceService = require("../services/service.service");
 
 async function createService(req, res, next) {
   try {
