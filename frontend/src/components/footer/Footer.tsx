@@ -179,8 +179,15 @@ const Footer = () => {
       <div className="py-4 border-t border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-gray-500">
           <p>&copy; Copyright Abe Garage 2025. All right reserved.</p>
-          <div className="flex flex-col items-end">
-            <p>Built by Tesfamichael</p>
+          <div className="flex flex-col items-start mr-16">
+            <a
+              href="https://www.mikeyhope.software/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-customeRed"
+            >
+              Built by Tesfamichael Tafere
+            </a>
             <a
               href="https://github.com/Tesfamichael12/Abe-Garage"
               target="_blank"
@@ -190,7 +197,8 @@ const Footer = () => {
               Source Code
               <img
                 src="https://skillicons.dev/icons?i=github"
-                height="16"
+                height="20"
+                width="20"
                 alt="GitHub"
               />
             </a>
