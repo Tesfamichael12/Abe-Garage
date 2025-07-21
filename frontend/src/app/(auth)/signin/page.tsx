@@ -6,6 +6,7 @@ import { PulseLoader } from "react-spinners";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 type FormFields = {
   email: string;
@@ -26,6 +27,27 @@ function SignInPage() {
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     const { email, password } = data;
+    const toastId = toast.loading(
+      "Connecting to the server... Render server might be spinning up from inactivity, which could take up to 50 seconds, only for the initial request. Thank you for your patience.",
+      {
+        duration: 80000,
+        style: {
+          background: "rgba(255, 255, 255, 0.5)",
+          backdropFilter: "blur(10px)",
+          color: "#000000",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+          borderRadius: "12px",
+          borderLeft: "4px solid #FFD700",
+          padding: "12px 16px",
+          boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+          fontSize: "16px",
+          fontWeight: "600",
+          width: "400px",
+          maxWidth: "90vw",
+        },
+        className: "hover:pause",
+      }
+    );
 
     try {
       const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -37,13 +59,19 @@ function SignInPage() {
         callbackUrl,
       });
 
+      toast.dismiss(toastId);
+
       if (response?.error) {
         setError(true);
+        toast.error("Invalid credentials. Please try again.");
         console.error("Error during sign-in:", response.error);
       } else {
+        toast.success("Signed in successfully!");
         router.push(response?.url || "/dashboard");
       }
     } catch (error) {
+      toast.dismiss(toastId);
+      toast.error("An unexpected error occurred. Please try again later.");
       console.error("Error during sign-in:", error);
     }
   };
