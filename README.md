@@ -20,6 +20,7 @@
 - 🛠️ **Service Management:** Full CRUD operations for managing the services offered by the garage.
 - 📱 **Responsive Design:** A clean, modern, and mobile-first UI that works on all devices.
 - ⚡ **Optimized for Performance:** Built with Next.js for fast page loads and a smooth user experience.
+- 🔍 **Search Engine Optimized (SEO):** Enhanced with dynamic meta tags, a `sitemap.xml` for better search engine indexing, and a `robots.txt` file to guide web crawlers. Indexed with Google Search Console to monitor search performance.
 
 ---
 
