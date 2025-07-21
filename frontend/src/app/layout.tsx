@@ -7,6 +7,7 @@ import Providers from "@/components/Providers";
 import AuthSync from "@/components/AuthSync";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 import { Toaster } from "react-hot-toast";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
@@ -52,6 +53,7 @@ export default function RootLayout({
         <Providers>
           <AuthSync />
           <Toaster />
+          <ScrollToTop />
           <Header />
           {children}
           <Footer />
