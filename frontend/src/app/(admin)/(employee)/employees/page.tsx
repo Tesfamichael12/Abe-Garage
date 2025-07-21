@@ -59,12 +59,8 @@ function EmployeesPage() {
     );
 
   if (isError) {
-    console.log("Error fetching employees:", error);
-    return (
-      <div className="text-center text-customeRed mt-10">
-        Error loading employees. Please try again.
-      </div>
-    );
+    toast.error("Error fetching employees. Please try again later.");
+    return <div>Error fetching employees. Please try again later.</div>;
   }
 
   return (

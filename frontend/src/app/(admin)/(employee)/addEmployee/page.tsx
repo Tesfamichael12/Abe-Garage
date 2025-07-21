@@ -24,10 +24,7 @@ function AddEmployeePage() {
       toast.success("Employee added successfully!");
       router.push("/employees");
     } catch (error: any) {
-      console.error("Error during adding employee:", error);
-      toast.error(
-        error.data?.message || "Something went wrong, please try again."
-      );
+      toast.error("Failed to add employee. Please try again.");
     }
   };
 

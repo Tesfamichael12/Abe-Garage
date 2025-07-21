@@ -24,10 +24,7 @@ function AddCustomerPage() {
       toast.success("Customer added successfully!");
       router.push("/customers");
     } catch (error: any) {
-      console.error("Error during adding customer:", error);
-      toast.error(
-        error.data?.message || "Something went wrong, please try again."
-      );
+      toast.error("Failed to add customer. Please try again.");
     }
   };
 

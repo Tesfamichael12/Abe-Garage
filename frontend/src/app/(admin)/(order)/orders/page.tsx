@@ -7,6 +7,7 @@ import {
 import { Order, updateOrderRequest } from "@/types";
 import { FiChevronLeft, FiChevronRight, FiChevronDown } from "react-icons/fi";
 import { PuffLoader } from "react-spinners";
+import { toast } from "react-hot-toast";
 
 const OrdersPage = () => {
   const [page, setPage] = useState(1);
@@ -23,9 +24,10 @@ const OrdersPage = () => {
 
   const handleStatusChange = async (order_id: number, newStatus: number) => {
     try {
-      await updateOrder({ order_id, order_status: newStatus });
+      await updateOrder({ order_id, order_status: newStatus }).unwrap();
+      toast.success(`Order status updated to ${newStatus}`);
     } catch (err) {
-      console.error("Failed to update order status:", err);
+      toast.error("Failed to update order status. Please try again.");
     }
   };
 
@@ -53,10 +55,10 @@ const OrdersPage = () => {
       </div>
     );
   if (isError) {
-    console.error("Error fetching orders:", error);
+    toast.error("Failed to fetch orders. Please try again later.");
     return (
-      <div className="text-center text-customeRed mt-10">
-        Error loading orders. Please try again.
+      <div className="text-red-500 text-center mt-10">
+        Error fetching orders. Please try again later.
       </div>
     );
   }

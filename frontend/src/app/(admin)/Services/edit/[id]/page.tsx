@@ -43,8 +43,7 @@ function EditServicePage() {
       toast.success("Service updated successfully");
       router.push("/Services");
     } catch (error) {
-      console.log(error);
-      toast.error("sorry,something went wrong. Please try again");
+      toast.error("Failed to update service. Please try again.");
     }
   };
 

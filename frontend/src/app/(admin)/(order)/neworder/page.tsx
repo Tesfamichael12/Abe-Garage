@@ -15,6 +15,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { PulseLoader } from "react-spinners";
 import { FiUser, FiTruck, FiSettings, FiCheckCircle } from "react-icons/fi";
+import { toast } from "react-hot-toast";
 
 const steps = [
   { id: 1, name: "Find Customer", icon: FiUser },
@@ -109,9 +110,9 @@ function NewOrderPage() {
     try {
       await createOrder(newOrder).unwrap();
       router.push("/orders");
+      toast.success("Order created successfully!");
     } catch (error) {
-      console.error("Failed to create order", error);
-      setErrorMessage("Failed to create order. Please try again later.");
+      toast.error("Failed to create order. Please try again.");
     }
   };
 

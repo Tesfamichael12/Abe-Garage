@@ -71,7 +71,6 @@ function SignInPage() {
       if (response?.error) {
         setError(true);
         toast.error("Invalid credentials. Please try again.");
-        console.error("Error during sign-in:", response.error);
       } else {
         toast.success("Signed in successfully!");
         router.push(response?.url || "/dashboard");
@@ -79,7 +78,6 @@ function SignInPage() {
     } catch (error) {
       toast.dismiss(toastId);
       toast.error("An unexpected error occurred. Please try again later.");
-      console.error("Error during sign-in:", error);
     }
   };
 
