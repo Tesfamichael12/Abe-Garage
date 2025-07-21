@@ -8,6 +8,7 @@ import AuthSync from "@/components/AuthSync";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 import { Toaster } from "react-hot-toast";
 import ScrollToTop from "@/components/ScrollToTop";
+import "./fonts/flaticon.css";
 
 const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
@@ -114,11 +115,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning={true}>
       <head>
         <link rel="icon" href="/images/imgi_1_favicon.png" type="image/png" />
-        <link
-          rel="stylesheet"
-          type="text/css"
-          href="/fonts/flaticon.css"
-        ></link>
       </head>
       <body
         className={`${bebasNeue.variable} ${jost.variable} ${lato.variable} font-sans`}
