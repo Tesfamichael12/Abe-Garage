@@ -202,7 +202,7 @@ function Header() {
         </ul>
       </div>
 
-      <div className="h-[140px] md:h-[130px]"></div>
+      <div className="h-[114px] md:h-[130px]"></div>
     </header>
   );
 }
