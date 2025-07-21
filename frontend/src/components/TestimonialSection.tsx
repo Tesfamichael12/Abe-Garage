@@ -30,7 +30,7 @@ function TestimonialSection() {
       <h2 className="text-4xl font-jost font-bold text-center text-customBlue mb-8">
         WHAT OUR CLIENTS SAY
       </h2>
-      <div className="overflow-hidden relative h-64">
+      <div className="relative h-80 sm:h-64">
         {testimonials.map((testimonial, index) => (
           <div
             key={index}
