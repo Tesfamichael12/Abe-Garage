@@ -1,20 +1,17 @@
-const { query } = require("../config/db.config");
+const db = require("../config/db.config");
 
-const getKPIs = async () => {
+async function getKpis() {
   try {
-    const sql = `SELECT
-    (SELECT COUNT(*) FROM customer_identifier) AS total_customers,
-    (SELECT COUNT(*) FROM orders WHERE active_order = true) AS active_orders,
-    (SELECT SUM(order_total_price) FROM order_info) AS total_revenue;
-`;
-    const [kpis] = await query(sql);
-
-    return kpis;
+    const [rows] = await db.execute(
+      "SELECT (SELECT COUNT(*) FROM customer) as total_customers, " +
+        "(SELECT COUNT(*) FROM `order` WHERE order_status = 1) as active_orders, " +
+        "(SELECT SUM(order_price) FROM `order` WHERE order_status = 2) as total_revenue"
+    );
+    return rows[0];
   } catch (error) {
-    console.log("Error getting KPIs", error.message);
     throw new Error("Error getting KPIs");
   }
-};
+}
 
 const getOrderTrends = async () => {
   try {

@@ -1,45 +1,54 @@
-const { query } = require("../config/db.config");
-
-const { getEmployeeByEmail } = require("../services/employee.service");
-
+const db = require("../config/db.config");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
-async function logIn(employeeData) {
+async function login(employee) {
+  const { employee_email, employee_password } = employee;
+
   try {
-    const employeeInfo = await getEmployeeByEmail(employeeData.employee_email);
-    let returnData = {};
-    if (employeeInfo.length == 0) {
-      returnData = {
-        status: "Fail",
-        message: "Employee does not exist",
-      };
-
-      return returnData;
-    }
-    const passwordMatch = await bcrypt.compare(
-      employeeData.employee_password,
-      employeeInfo[0].employee_password_hashed
+    const [rows] = await db.execute(
+      "SELECT * FROM employee WHERE employee_email = ?",
+      [employee_email]
     );
 
-    if (!passwordMatch) {
-      returnData = {
-        status: "Fail",
-        message: "Incorrect password",
-      };
-      return returnData;
+    if (rows.length === 0) {
+      throw new Error("Invalid email or password");
     }
 
-    returnData = {
-      status: "Success",
-      data: employeeInfo[0],
-    };
-    return returnData;
+    const user = rows[0];
+
+    const passwordMatches = await bcrypt.compare(
+      employee_password,
+      user.employee_password_hashed
+    );
+
+    if (!passwordMatches) {
+      throw new Error("Invalid email or password");
+    }
+
+    const token = jwt.sign(
+      {
+        employee_id: user.employee_id,
+        employee_email: user.employee_email,
+        employee_first_name: user.employee_first_name,
+        employee_role: user.company_role_id,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
+
+    return { token };
   } catch (error) {
-    console.log("error", error);
-    return {
-      status: "Fail",
-      message: "Error during database operation.",
-    };
+    if (error.message === "Invalid email or password") {
+      throw error;
+    }
+    throw new Error("Error during login");
   }
 }
-module.exports = { logIn };
+
+module.exports = {
+  login,
+};

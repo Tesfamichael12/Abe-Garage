@@ -1,259 +1,144 @@
-const { query } = require("../config/db.config");
-const crypto = require("crypto");
-const Jwt_secret = process.env.JWT_SECRET;
+const db = require("../config/db.config");
 
 async function createOrder(order) {
-  const uniqueString = `${order.employee_id}-${order.customer_id}-${
-    order.vehicle_id
-  }-${Date.now()}`;
-  const order_hash = crypto
-    .createHash("sha256")
-    .update(uniqueString + Jwt_secret)
-    .digest("hex");
+  const {
+    customer_id,
+    order_date,
+    order_status,
+    order_price,
+    order_description,
+    services,
+    vehicle_id,
+  } = order;
+
+  const connection = await db.getConnection();
+  await connection.beginTransaction();
 
   try {
-    const sql1 =
-      "INSERT INTO orders (employee_id, customer_id,vehicle_id, active_order,order_hash) VALUES ($1,$2,$3,$4,$5) RETURNING order_id";
-    const result1 = await query(sql1, [
-      order.employee_id,
-      order.customer_id,
-      order.vehicle_id,
-      true,
-      order_hash,
-    ]);
-    const order_id = result1[0].order_id;
+    const [orderResult] = await connection.execute(
+      "INSERT INTO `order` (customer_id, vehicle_id, order_date, order_status, order_price, order_description) VALUES (?, ?, ?, ?, ?, ?)",
+      [
+        customer_id,
+        vehicle_id,
+        order_date,
+        order_status,
+        order_price,
+        order_description,
+      ]
+    );
 
-    const sql2 =
-      "INSERT INTO order_info (order_id,order_total_price,additional_request,additional_requests_completed) VALUES ($1,$2,$3,$4)";
-    await query(sql2, [
-      order_id,
-      order.order_total_price,
-      order.additional_request || null,
-      !!order.additional_request,
-    ]);
+    const orderId = orderResult.insertId;
 
-    if (order?.order_services) {
-      const sql3 =
-        "INSERT INTO order_services (order_id,service_id,service_completed) VALUES ($1,$2,$3)";
-      for (let i = 0; i < order.order_services.length; i++) {
-        await query(sql3, [
-          order_id,
-          order.order_services[i].service_id,
-          false,
-        ]);
-      }
-    }
+    const servicePromises = services.map((serviceId) => {
+      return connection.execute(
+        "INSERT INTO order_service (order_id, service_id) VALUES (?, ?)",
+        [orderId, serviceId]
+      );
+    });
 
-    const sql4 =
-      "INSERT INTO order_status (order_id,order_status) VALUES ($1,$2)";
-    await query(sql4, [order_id, 0]);
+    await Promise.all(servicePromises);
 
-    return true;
+    await connection.commit();
+    connection.release();
+
+    return { id: orderId, ...order };
   } catch (error) {
-    console.error("Error creating order in service:", error);
-    throw new Error("Error creating order");
+    await connection.rollback();
+    connection.release();
+    throw new Error("Error creating order in service");
   }
 }
 
-async function getOrders(page, limit) {
-  const offset = (page - 1) * limit;
-
+async function getAllOrders(page = 1, limit = 10, status = null) {
   try {
-    const sql = `
-      SELECT 
-        o.order_id,
-        o.employee_id,
-        CONCAT(ei.employee_first_name, ' ', ei.employee_last_name) AS employee_name,
-        o.customer_id,
-        o.vehicle_id,
-        o.order_date,
-        o.active_order,
-        o.order_hash,
-        oi.order_total_price,
-        os.order_status,
-        ci.customer_email,
-        CONCAT(cinfo.customer_first_name, ' ', cinfo.customer_last_name) AS customer_name,
-        v.vehicle_model,
-        v.vehicle_tag
-FROM
-        orders o
-      LEFT JOIN 
-        order_info oi ON o.order_id = oi.order_id
-      LEFT JOIN 
-        order_status os ON o.order_id = os.order_id
-      LEFT JOIN 
-        customer_identifier ci ON o.customer_id = ci.customer_id
-      LEFT JOIN 
-        customer_info cinfo ON o.customer_id = cinfo.customer_id
-      LEFT JOIN 
-        customer_vehicle_info v ON o.vehicle_id = v.vehicle_id
-      LEFT JOIN 
-        employee e ON o.employee_id = e.employee_id
-      LEFT JOIN 
-        employee_info ei ON e.employee_id = ei.employee_id
-      LIMIT $1 OFFSET $2;
-    `;
+    let query =
+      "SELECT o.*, c.customer_first_name, c.customer_last_name, v.vehicle_make, v.vehicle_model FROM `order` o JOIN customer c ON o.customer_id = c.customer_id JOIN vehicle v ON o.vehicle_id = v.vehicle_id";
+    const params = [];
 
-    const orders = await query(sql, [limit, offset]);
-    return orders;
+    if (status) {
+      query += " WHERE o.order_status = ?";
+      params.push(status);
+    }
+
+    query += " ORDER BY o.order_date DESC LIMIT ? OFFSET ?";
+    params.push(limit, (page - 1) * limit);
+
+    const [rows] = await db.execute(query, params);
+
+    const [[{ "COUNT(*)": total }]] = await db.execute(
+      `SELECT COUNT(*) FROM \`order\` ${
+        status ? "WHERE order_status = ?" : ""
+      }`,
+      status ? [status] : []
+    );
+
+    return {
+      orders: rows,
+      total,
+      page,
+      limit,
+    };
   } catch (error) {
-    console.log("Error getting orders", error.message);
     throw new Error("Error getting orders");
   }
 }
 
-async function getOrderByHash(hash) {
+async function getOrderById(id) {
   try {
-    const sql = `
-        SELECT 
-            o.order_id,
-            o.employee_id,
-            o.customer_id,
-            o.vehicle_id,
-            o.order_date,
-            o.active_order,
-            o.order_hash,
-            oi.order_total_price,
-            oi.additional_request,
-            oi.additional_requests_completed,
-            os.order_status
-        FROM 
-            orders o
-        LEFT JOIN 
-            order_info oi ON o.order_id = oi.order_id
-        LEFT JOIN 
-            order_status os ON o.order_id = os.order_id
-        WHERE 
-            o.order_hash = $1;
-    `;
-
-    const [order] = await query(sql, [hash]);
-
-    if (!order) {
-      return false;
+    const [rows] = await db.execute(
+      "SELECT o.*, c.*, v.* FROM `order` o JOIN customer c ON o.customer_id = c.customer_id JOIN vehicle v ON o.vehicle_id = v.vehicle_id WHERE o.order_id = ?",
+      [id]
+    );
+    if (rows.length === 0) {
+      throw new Error("Order not found");
     }
-
-    const sql2 = `SELECT 
-        os.order_service_id,
-        os.service_id,
-        os.service_completed,
-        cs.service_name,
-        cs.service_description
-    FROM 
-        order_services os
-    LEFT JOIN 
-        common_services cs ON os.service_id = cs.service_id
-    WHERE 
-        os.order_id = $1;
-`;
-
-    const services = await query(sql2, [order.order_id]);
-    order.order_services = services;
-    return order;
+    const [services] = await db.execute(
+      "SELECT s.* FROM service s JOIN order_service os ON s.service_id = os.service_id WHERE os.order_id = ?",
+      [id]
+    );
+    return { ...rows[0], services };
   } catch (error) {
-    console.log("Error getting order by hash", error.message);
-    throw new Error("Error getting order by hash");
+    if (error.message === "Order not found") {
+      throw error;
+    }
+    throw new Error("Error getting order by id");
   }
 }
 
-async function updateOrder(order) {
+async function updateOrderStatus(id, status) {
   try {
-    const sql1 = "UPDATE orders SET active_order = $1 WHERE order_id = $2";
-    await query(sql1, [order.active_order, order.order_id]);
-
-    const sql2 =
-      "UPDATE order_info SET order_total_price = $1, additional_request = $2, additional_requests_completed = $3 WHERE order_id = $4";
-    await query(sql2, [
-      order.order_total_price,
-      order.additional_request,
-      order.additional_requests_completed,
-      order.order_id,
-    ]);
-
-    const sql3 =
-      "UPDATE order_status SET order_status = $1 WHERE order_id = $2";
-    await query(sql3, [order.order_status, order.order_id]);
-
-    const sql4 = "DELETE FROM order_services WHERE order_id = $1";
-    await query(sql4, [order.order_id]);
-
-    const sql5 =
-      "INSERT INTO order_services (order_id,service_id,service_completed) VALUES ($1,$2,$3)";
-    for (let i = 0; i < order.order_services.length; i++) {
-      await query(sql5, [
-        order.order_id,
-        order.order_services[i].service_id,
-        order.order_services[i].service_completed,
-      ]);
+    const [result] = await db.execute(
+      "UPDATE `order` SET order_status = ? WHERE order_id = ?",
+      [status, id]
+    );
+    if (result.affectedRows === 0) {
+      throw new Error("Order not found");
     }
-
-    return true;
+    return { message: "Order status updated successfully" };
   } catch (error) {
-    console.error("Error updating order in service:", error);
+    if (error.message === "Order not found") {
+      throw error;
+    }
     throw new Error("Error updating order");
   }
 }
 
-async function getCustomerOrders(id) {
+async function getOrdersByCustomerId(customerId) {
   try {
-    const sql = `
-      SELECT 
-        o.order_id,
-        o.employee_id,
-        CONCAT(ei.employee_first_name, ' ', ei.employee_last_name) AS employee_name,
-        o.customer_id,
-        o.vehicle_id,
-        o.order_date,
-        o.active_order,
-        o.order_hash,
-        oi.order_total_price,
-        os.order_status,
-        ci.customer_email,
-        CONCAT(cinfo.customer_first_name, ' ', cinfo.customer_last_name) AS customer_name,
-        v.vehicle_model,
-        v.vehicle_tag
-FROM
-        orders o
-      LEFT JOIN 
-        order_info oi ON o.order_id = oi.order_id
-      LEFT JOIN 
-        order_status os ON o.order_id = os.order_id
-      LEFT JOIN 
-        customer_identifier ci ON o.customer_id = ci.customer_id
-      LEFT JOIN 
-        customer_info cinfo ON o.customer_id = cinfo.customer_id
-      LEFT JOIN 
-        customer_vehicle_info v ON o.vehicle_id = v.vehicle_id
-      LEFT JOIN 
-        employee e ON o.employee_id = e.employee_id
-      LEFT JOIN 
-        employee_info ei ON e.employee_id = ei.employee_id
-      WHERE o.customer_id = $1;
-    `;
-    const orders = await query(sql, [id]);
-    return orders;
+    const [rows] = await db.execute(
+      "SELECT o.*, v.vehicle_make, v.vehicle_model FROM `order` o JOIN vehicle v ON o.vehicle_id = v.vehicle_id WHERE o.customer_id = ?",
+      [customerId]
+    );
+    return rows;
   } catch (error) {
-    console.log("Error getting customer orders", error.message);
     throw new Error("Error getting customer orders");
-  }
-}
-
-async function updateOrderStatus(order_id, order_status) {
-  try {
-    const sql = "UPDATE order_status SET order_status = $1 WHERE order_id = $2";
-    await query(sql, [order_status, order_id]);
-    return true;
-  } catch (error) {
-    console.log("Error updating order status", error.message);
-    throw new Error("Error updating order status");
   }
 }
 
 module.exports = {
   createOrder,
-  getOrders,
-  getOrderByHash,
-  updateOrder,
-  getCustomerOrders,
+  getAllOrders,
+  getOrderById,
   updateOrderStatus,
+  getOrdersByCustomerId,
 };

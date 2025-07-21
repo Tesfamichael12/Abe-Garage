@@ -5,6 +5,15 @@ const cors = require("cors");
 const helmet = require("helmet");
 const routes = require("./routes/index");
 const rateLimit = require("express-rate-limit");
+const installRoutes = require("./routes/install.routes");
+const customerRoutes = require("./routes/customer.routes");
+const employeeRoutes = require("./routes/employee.routes");
+const vehicleRoutes = require("./routes/vehicle.routes");
+const orderRoutes = require("./routes/order.routes");
+const serviceRoutes = require("./routes/service.routes");
+const loginRoutes = require("./routes/login.routes");
+const dashboardRoutes = require("./routes/dashboard.routes");
+const errorHandler = require("./middlewares/errorHandler");
 
 const allowedOrigins = [
   "http://localhost:3000",
@@ -34,15 +43,19 @@ app.use(cors(corsOptions));
 app.use(helmet());
 app.use(limiter);
 
-app.use(routes);
-
-app.use((err, req, res, next) => {
-  res.status(err.status || 500);
-  res.json({
-    message: err.message,
-    error: err,
-  });
+app.use(installRoutes);
+app.use(customerRoutes);
+app.use(employeeRoutes);
+app.use(vehicleRoutes);
+app.use(orderRoutes);
+app.use(serviceRoutes);
+app.use(loginRoutes);
+app.get("/", (req, res) => {
+  res.send("Hello World!");
 });
+app.use(dashboardRoutes);
+
+app.use(errorHandler);
 
 const port = process.env.PORT;
 app.listen(port, (err) => {

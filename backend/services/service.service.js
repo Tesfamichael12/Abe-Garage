@@ -1,102 +1,95 @@
-const { query } = require("../config/db.config");
+const db = require("../config/db.config");
 
-async function checkIfServiceExist(service_name) {
-  const normalizedServiceName = service_name.trim().toLowerCase();
-
-  const sql =
-    "SELECT COUNT(*) as count FROM common_services WHERE LOWER(TRIM(service_name))=$1";
-
+async function checkServiceExists(serviceName) {
   try {
-    const result = await query(sql, [normalizedServiceName]);
-    return result[0].count > 0;
+    const [rows] = await db.execute(
+      "SELECT * FROM service WHERE service_name = ?",
+      [serviceName]
+    );
+    return rows.length > 0;
   } catch (error) {
-    console.log("error checking if service exists", error);
-    throw new Error(error.message);
+    throw new Error("Error checking if service exists");
   }
 }
 
-async function createService(serviceData) {
-  const { service_name, service_description } = serviceData;
-
-  const sql =
-    "INSERT INTO common_services (service_name,service_description) VALUES($1,$2)";
-
+async function createService(service) {
   try {
-    await query(sql, [service_name, service_description]);
-    return { status: "true" };
+    const [result] = await db.execute(
+      "INSERT INTO service (service_name, service_description) VALUES (?, ?)",
+      [service.service_name, service.service_description]
+    );
+    return { id: result.insertId, ...service };
   } catch (error) {
-    console.log("error creating service", error);
-    throw new Error("Failed to create service");
+    throw new Error("Error creating service");
   }
 }
 
 async function getAllServices() {
-  const sql = "SELECT * FROM common_services";
-
   try {
-    const services = await query(sql);
-    return services;
+    const [rows] = await db.execute("SELECT * FROM service");
+    return rows;
   } catch (error) {
-    console.log("error getting all services", error);
-    throw new Error("Failed to get services");
+    throw new Error("Error getting all services");
   }
 }
 
 async function getServiceById(id) {
-  if (isNaN(id)) {
-    throw new Error("Invalid id");
-  }
-  const sql = "SELECT * FROM common_services WHERE service_id=$1";
-
   try {
-    const service = await query(sql, [id]);
-    return service[0];
+    const [rows] = await db.execute(
+      "SELECT * FROM service WHERE service_id = ?",
+      [id]
+    );
+    if (rows.length === 0) {
+      throw new Error("Service not found");
+    }
+    return rows[0];
   } catch (error) {
-    console.log("error getting service by id", error);
-    throw new Error("Failed to get service");
+    if (error.message === "Service not found") {
+      throw error;
+    }
+    throw new Error("Error getting service by id");
   }
 }
 
-async function updateService(serviceData) {
-  const { service_id, service_name, service_description } = serviceData;
-
-  const sql =
-    "UPDATE common_services SET service_name=$1,service_description=$2 WHERE service_id=$3";
-
+async function updateService(id, service) {
   try {
-    await query(sql, [service_name, service_description, service_id]);
-    return { status: "true" };
+    const [result] = await db.execute(
+      "UPDATE service SET service_name = ?, service_description = ? WHERE service_id = ?",
+      [service.service_name, service.service_description, id]
+    );
+    if (result.affectedRows === 0) {
+      throw new Error("Service not found");
+    }
+    return { id, ...service };
   } catch (error) {
-    console.log("error updating service", error);
-    throw new Error("Failed to update service");
+    if (error.message === "Service not found") {
+      throw error;
+    }
+    throw new Error("Error updating service");
   }
 }
 
 async function deleteService(id) {
-  if (isNaN(id)) {
-    throw new Error("Invalid id");
-  }
-
   try {
-    const checkOrdersSql =
-      "SELECT COUNT(*) as count FROM order_services WHERE service_id=$1";
-    const result = await query(checkOrdersSql, [id]);
-    if (result[0].count > 0) {
-      throw new Error("Cannot delete service that is associated with an order");
+    const [result] = await db.execute(
+      "DELETE FROM service WHERE service_id = ?",
+      [id]
+    );
+    if (result.affectedRows === 0) {
+      throw new Error("Service not found");
     }
-
-    const sql = "DELETE FROM common_services WHERE service_id=$1";
-    await query(sql, [id]);
-    return { status: "true" };
+    return { message: "Service deleted successfully" };
   } catch (error) {
-    console.log("error deleting service", error);
-    throw new Error(error.message || "Failed to delete service");
+    if (error.message === "Service not found") {
+      throw error;
+    }
+    throw new Error("Error deleting service");
   }
 }
 
 module.exports = {
+  checkServiceExists,
   createService,
-  checkIfServiceExist,
   getAllServices,
   getServiceById,
   updateService,
