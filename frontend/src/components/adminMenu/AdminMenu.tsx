@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import {
   FiGrid,
   FiUsers,
@@ -27,6 +28,7 @@ const menuItems = [
 const AdminMenu = () => {
   const { data: session } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const pathname = usePathname();
 
   if (!session) {
     return null;
@@ -53,19 +55,26 @@ const AdminMenu = () => {
       </div>
 
       <ul className="flex-1 mt-5 space-y-2 px-4">
-        {menuItems.map(({ name, href, icon: Icon }) => (
-          <li key={name}>
-            <Link
-              href={href}
-              className="flex items-center space-x-3 p-3 hover:bg-gray-800 hover:text-white rounded-md transition-colors"
-            >
-              <Icon className="text-xl" />
-              {isMenuOpen && (
-                <span className="text-sm font-medium">{name}</span>
-              )}
-            </Link>
-          </li>
-        ))}
+        {menuItems.map(({ name, href, icon: Icon }) => {
+          const isActive = pathname === href;
+          return (
+            <li key={name}>
+              <Link
+                href={href}
+                className={`flex items-center space-x-3 p-3 rounded-md transition-all duration-300 ease-in-out ${
+                  isActive
+                    ? "bg-customeRed text-white"
+                    : "hover:bg-gray-800 hover:text-white"
+                }`}
+              >
+                <Icon className="text-xl" />
+                {isMenuOpen && (
+                  <span className="text-sm font-medium">{name}</span>
+                )}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
