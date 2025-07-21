@@ -28,10 +28,11 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: "Abe's Garage - Expert Vehicle Repair & Management",
+  title: "Abe Garage - Expert Vehicle Repair & Management",
   description:
-    "Abe's Garage offers top-tier vehicle repair and maintenance services. Our modern management system provides secure, role-based access for employees and a seamless experience for customers. Schedule your next service with us!",
+    "Abe Garage offers top-tier vehicle repair and maintenance services. Our modern management system provides secure, role-based access for employees and a seamless experience for customers. Schedule your next service with us!",
   keywords: [
+    "Abe Garage",
     "Abe's Garage",
     "vehicle repair",
     "car maintenance",
@@ -57,11 +58,11 @@ export const metadata: Metadata = {
   publisher: "Tesfamichael Tafere",
   robots: "index, follow",
   openGraph: {
-    title: "Abe's Garage - Expert Vehicle Repair & Management",
+    title: "Abe Garage - Expert Vehicle Repair & Management",
     description:
       "Your one-stop shop for reliable and professional vehicle services.",
     url: "https://abe-garage-one.vercel.app",
-    siteName: "Abe's Garage",
+    siteName: "Abe Garage",
     images: [
       {
         url: "https://abe-garage-one.vercel.app/og-image.png",
@@ -74,9 +75,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Abe's Garage - Expert Vehicle Repair & Management",
+    title: "Abe Garage - Expert Vehicle Repair & Management",
     description:
-      "From routine maintenance to complex repairs, Abe's Garage has you covered. Check out our services!",
+      "From routine maintenance to complex repairs, Abe Garage has you covered. Check out our services!",
     creator: "@twitter_handle",
     images: ["https://abe-garage-one.vercel.app/twitter-image.png"],
   },
