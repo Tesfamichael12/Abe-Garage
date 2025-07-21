@@ -179,7 +179,22 @@ const Footer = () => {
       <div className="py-4 border-t border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-gray-500">
           <p>&copy; Copyright Abe Garage 2025. All right reserved.</p>
-          <p>Built by Tesfamichael</p>
+          <div className="flex flex-col items-end">
+            <p>Built by Tesfamichael</p>
+            <a
+              href="https://github.com/Tesfamichael12/Abe-Garage"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 hover:text-customeRed"
+            >
+              Source Code
+              <img
+                src="https://skillicons.dev/icons?i=github"
+                height="16"
+                alt="GitHub"
+              />
+            </a>
+          </div>
         </div>
       </div>
     </footer>

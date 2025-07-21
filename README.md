@@ -10,6 +10,27 @@
 
 ---
 
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td valign="top" width="50%">
+      <h3 align="center">Landing Page</h3>
+      <img src="images/image-0.png" alt="Main Dashboard" width="100%"/>
+    </td>
+    <td valign="top" width="50%">
+      <h3 align="center">Admin Pages</h3>
+      <img src="images/image-1.png" alt="Employee Management" width="100%"/>
+      <img src="images/image-2.png" alt="Customer Management" width="100%"/>
+      <img src="images/image-3.png" alt="Order Creation" width="100%"/>
+      <img src="images/image-4.png" alt="Service Management" width="100%"/>
+      <img src="images/image-5.png" alt="Order Details" width="100%"/>
+      <img src="images/image-6.png" alt="Login Page" width="100%"/>
+      <img src="images/image-7.png" alt="Mobile View" width="100%"/>
+    </td>
+  </tr>
+</table>
+
 ## ✨ Features
 
 - 🔐 **Secure Authentication:** Role-based access control with JWT for employees and admins.
@@ -137,3 +158,4 @@ cd Abe-Garage
 ## 🙌 Credits
 
 - Built by [Tesfamichael Tafere](https://github.com/Tesfamichael12)
+- <a href="https://github.com/Tesfamichael12/Abe-Garage"><strong>Source Code</strong> <img src="https://skillicons.dev/icons?i=github" height="20" alt="GitHub"/></a>
