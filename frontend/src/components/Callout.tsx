@@ -8,7 +8,7 @@ const Callout = () => {
   return (
     <section className="bg-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-customeRed text-white p-12 shadow-lg">
+        <div className="bg-customeRed text-white py-12 px-4 shadow-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-center">
             {/* Left Section: Title and Subtitle */}
             <div className="lg:col-span-1">
