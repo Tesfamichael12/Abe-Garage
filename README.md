@@ -1,4 +1,3 @@
-
 # 🚗 Abe's Garage Management System
 
 > A full-stack, production-grade vehicle repair and management system. Built with a modern Next.js/React frontend (Tailwind CSS, Redux Toolkit, Recharts), a robust Node.js/Express backend, and a PostgreSQL database. Designed for scalability, security, and a seamless user experience—showcasing best practices for enterprise-level business applications.
@@ -55,6 +54,21 @@
 
 ---
 
+## 🚀 Deployment
+
+<p align="left">
+  <img src="https://skillicons.dev/icons?i=vercel,supabase" height="32" alt="Deployment platforms"/>
+  <img src="https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Render"/>
+</p>
+
+This application is deployed across a modern, scalable infrastructure:
+
+- **Frontend:** Hosted on **Vercel**, providing a seamless, high-performance experience with Next.js.
+- **Backend:** The Node.js API is deployed on **Render**, ensuring a reliable and scalable server environment.
+- **Database:** The PostgreSQL database is managed by **Supabase**, offering a robust and secure data layer.
+
+---
+
 ## 🔒 Security
 
 The backend is built with security in mind, incorporating several key features to protect against common vulnerabilities:
@@ -63,15 +77,6 @@ The backend is built with security in mind, incorporating several key features t
 - **CORS:** The Cross-Origin Resource Sharing policy is configured to only allow requests from the deployed frontend, preventing unauthorized access.
 - **Rate Limiting:** Protects against brute-force attacks by limiting the number of requests from a single IP address.
 - **Centralized Error Handling:** Ensures that all errors are handled gracefully and consistently, preventing information leaks.
-
----
-
-## 🚀 Deployment
-
-This application is built for production and can be deployed to any modern cloud platform.
-
-- **Frontend:** The Next.js frontend is optimized for Vercel, providing a seamless deployment experience.
-- **Backend:** The Node.js/Express backend is configured for deployment on Render, with a production-ready PostgreSQL database.
 
 ---
 
