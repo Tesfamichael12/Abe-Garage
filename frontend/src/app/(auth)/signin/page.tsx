@@ -78,7 +78,7 @@ function SignInPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="flex w-full max-w-4xl shadow-2xl">
+      <div className="flex w-full max-w-6xl shadow-2xl">
         {/* Left Panel: Form */}
         <div className="w-full lg:w-1/2 bg-white p-8 sm:p-12">
           <div className="mb-8 text-center">

@@ -6,6 +6,7 @@ import { HiMenu, HiX } from "react-icons/hi";
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import Button from "../ui/Button";
+import toast from "react-hot-toast";
 
 function Header() {
   const { data: session } = useSession();
@@ -30,6 +31,11 @@ function Header() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: "/signin" });
+    toast.success("Signed out successfully!");
+  };
 
   const navLinks = (
     <>
@@ -98,9 +104,7 @@ function Header() {
               {navLinks}
               {session ? (
                 <li className="pl-7">
-                  <Button onClick={() => signOut({ callbackUrl: "/signin" })}>
-                    LOGOUT
-                  </Button>
+                  <Button onClick={handleSignOut}>LOGOUT</Button>
                 </li>
               ) : (
                 <li className="pl-7">
@@ -141,9 +145,7 @@ function Header() {
               {navLinks}
               {session ? (
                 <li className="pl-7">
-                  <Button onClick={() => signOut({ callbackUrl: "/signin" })}>
-                    LOGOUT
-                  </Button>
+                  <Button onClick={handleSignOut}>LOGOUT</Button>
                 </li>
               ) : (
                 <li className="pl-7">
@@ -184,7 +186,7 @@ function Header() {
                 className="py-2 px-4"
                 onClick={() => {
                   setIsMenuOpen(false);
-                  signOut({ callbackUrl: "/signin" });
+                  handleSignOut();
                 }}
               >
                 LOGOUT
