@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaUserCircle } from "react-icons/fa";
 import { testimonials } from "@/constants/testimonial";
 import Image from "next/image";
 
@@ -27,8 +27,8 @@ function TestimonialSection() {
 
   return (
     <div className="relative w-full max-w-[1200px] mx-auto py-12 px-4">
-      <h2 className="text-4xl font-bold text-center text-customBlue mb-8">
-        What Our Clients Say
+      <h2 className="text-4xl font-jost font-bold text-center text-customBlue mb-8">
+        WHAT OUR CLIENTS SAY
       </h2>
       <div className="overflow-hidden relative h-64">
         {testimonials.map((testimonial, index) => (
@@ -39,13 +39,10 @@ function TestimonialSection() {
             }`}
           >
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <Image
-                src={testimonial.image}
-                alt={testimonial.name}
-                width={80}
-                height={80}
-                className="rounded-full mb-4"
-              />
+              <div className="relative mb-4">
+                <i className="fi fi-rr-quote-right text-4xl text-customeRed absolute -top-4 -left-8 transform rotate-12"></i>
+                <FaUserCircle className="text-8xl text-gray-300" />
+              </div>
               <p className="text-lg text-gray-700 max-w-2xl">
                 {testimonial.quote}
               </p>
@@ -56,15 +53,26 @@ function TestimonialSection() {
           </div>
         ))}
       </div>
+      <div className="flex justify-center space-x-2 mt-4">
+        {testimonials.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrent(index)}
+            className={`w-3 h-3 rounded-full ${
+              index === current ? "bg-customeRed" : "bg-gray-300"
+            }`}
+          ></button>
+        ))}
+      </div>
       <button
         onClick={() => paginate("prev")}
-        className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 p-2 rounded-full"
+        className="absolute top-1/2 left-8 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 p-2 rounded-full"
       >
         <FaChevronLeft />
       </button>
       <button
         onClick={() => paginate("next")}
-        className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 p-2 rounded-full"
+        className="absolute top-1/2 right-8 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 p-2 rounded-full"
       >
         <FaChevronRight />
       </button>
