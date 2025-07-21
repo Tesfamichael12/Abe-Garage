@@ -32,8 +32,8 @@ function SignInPage() {
       {
         duration: 80000,
         style: {
-          background: "rgba(255, 255, 255, 0.5)",
-          backdropFilter: "blur(10px)",
+          background: "rgba(255, 255, 255, 0.6)",
+          backdropFilter: "blur(15px)",
           color: "#000000",
           border: "1px solid rgba(255, 255, 255, 0.2)",
           borderRadius: "12px",
